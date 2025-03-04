@@ -1,0 +1,20 @@
+# docker/docker-compose.yml
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+    volumes:
+      - ../models:/app/models
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G

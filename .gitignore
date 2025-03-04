@@ -1,0 +1,36 @@
+# Environments
+.env
+.venv/
+env/
+venv/
+
+# Caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Model weights
+models/*.pt
+models/*.pth
+*.ckpt
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Build
+dist/
+build/
+*.egg-info/
+
+# Secrets
+*.key
+secrets.yaml
+.env*

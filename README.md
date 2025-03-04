@@ -114,11 +114,11 @@ If you use HelixSynth in your research, please cite:
 
 ```bibtex
 @software{helixsynth2024,
-  author = {Your Name},
+  author = {Allan},
   title = {HelixSynth: Fast Protein Secondary Structure Prediction},
   year = {2024},
   publisher = {GitHub},
-  url = {https://github.com/yourusername/helixsynth}
+  url = {https://github.com/DarkStarStrix/helixsynth}
 }
 ```
 

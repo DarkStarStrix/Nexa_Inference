@@ -5,7 +5,7 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://helixsynth.readthedocs.io/)
 
-HelixSynth is a state-of-the-art API for protein secondary structure prediction, leveraging deep learning to provide rapid and accurate predictions of helices (H), beta sheets (E), and coils (C).
+HelixSynth is API for protein secondary structure prediction, leveraging deep learning to provide rapid and accurate predictions of helices (H), beta sheets (E), and coils (C).
 
 ## 🚀 Quick Start
 
@@ -124,8 +124,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - 📧 Email: allanw.mk@gmail.com
-- 💬 Discord: [Join our community](https://discord.gg/helixsynth)
-- 🐦 Twitter: [@HelixSynth](https://twitter.com/helixsynth)
+- 💬 Discord: [Join our community](https://discord.gg/nWZmfN8V)
 
 ## 📦 Model Weights
 

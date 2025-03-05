@@ -1,4 +1,3 @@
-I'll create example documentation for open-sourcing this project, including usage examples and use cases.
 
 ```python
 # docs/README.md

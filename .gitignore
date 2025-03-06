@@ -34,7 +34,6 @@ logs/
 htpasswd
 
 # Secrets and configs
-.env
 *.pem
 *.key
 *.crt

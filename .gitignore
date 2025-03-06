@@ -1,36 +1,54 @@
-# Environments
-.env
-.venv/
-env/
-venv/
-
-# Caches
+# Python
 __pycache__/
 *.py[cod]
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Model weights
-models/*.pt
-models/*.pth
-*.ckpt
-
-# Logs
-logs/
-*.log
+*.so
+.Python
+venv/
+env/
+.env
+.env.*
 
 # IDE
-.vscode/
 .idea/
+.vscode/
 *.swp
+*.swo
+
+# Docker
+docker-data/
+*.env
+prometheus/data/
+grafana/data/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Project specific
+*.pth
+weights.pth
+*.log
+logs/
+htpasswd
+
+# Secrets and configs
+.env
+*.pem
+*.key
+*.crt
+
+# Database
+*.sqlite
+*.db
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
 
 # Build
 dist/
 build/
 *.egg-info/
-
-# Secrets
-*.key
-secrets.yaml
-.env*

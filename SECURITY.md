@@ -7,7 +7,7 @@ Please report security vulnerabilities to security@helixsynth.org.
 ## Supported Versions
 
 | Version | Supported          |
-| ------- | ------------------ |
+|---------|--------------------|
 | 1.0.x   | :white_check_mark: |
 
 ## Security Measures

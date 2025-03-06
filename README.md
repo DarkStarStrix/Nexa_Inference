@@ -53,18 +53,21 @@ pip install -e .
 ## 🎓 Use Cases
 
 ### Academic Research
+
+class HelixSynthClient:
+pass
+
 ```python
 from Bio import SeqIO
-from helixsynth.client import HelixSynthClient
 
-client = HelixSynthClient(api_key="your_api_key")
+client = HelixSynthClient (api_key="your_api_key")
 
 # Batch processing
-for record in SeqIO.parse("proteins.fasta", "fasta"):
-    prediction = client.predict(str(record.seq))
-    print(f">{record.id}")
-    print(f"Sequence: {record.seq}")
-    print(f"Structure: {prediction['structure']}")
+for record in SeqIO.parse ("proteins.fasta", "fasta"):
+    prediction = client.predict (str (record.seq))
+    print (f">{record.id}")
+    print (f"Sequence: {record.seq}")
+    print (f"Structure: {prediction ['structure']}")
 ```
 
 ### Pharmaceutical Applications
@@ -118,7 +121,7 @@ If you use HelixSynth in your research, please cite:
 
 ## 📝 License
 
-This project is licensed under the Apache License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License—see the [LICENSE](LICENSE) file for details.
 
 ## 📞 Support
 
@@ -133,3 +136,4 @@ Download the latest model weights:
 wget https://models.helixsynth.org/weights/helixsynth_mini.pt
 ```
 
+![HelixSynth](helixsynth.png)

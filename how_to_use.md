@@ -71,12 +71,12 @@ Request:
 
 ## Performance Benchmarks
 
-| Metric | Value |
-|--------|-------|
-| Accuracy (Q3) | 85.2% |
-| Latency (p95) | 98ms |
-| Throughput | 100 req/s |
-| Model Size | 25MB |
+| Metric        | Value     |
+|---------------|-----------|
+| Accuracy (Q3) | 85.2%     |
+| Latency (p95) | 98ms      |
+| Throughput    | 100 req/s |
+| Model Size    | 25MB      |
 
 ## Tests
 

@@ -1,51 +1,55 @@
 # app/core/inference.py
+from typing import Dict, Any, List
+
 import torch
-import logging
-from typing import Dict, Any
-from app.core.models.helix_synth_mini import HelixSynthMini
-from app.config import MODEL_CONFIG
 
-logger = logging.getLogger(__name__)
 
-class ProteinPredictor:
+class BasePredictor:
     def __init__(self):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model = self._load_model()
-        self.aa_map = {
-            'A': 0, 'C': 1, 'D': 2, 'E': 3, 'F': 4,
-            'G': 5, 'H': 6, 'I': 7, 'K': 8, 'L': 9,
-            'M': 10, 'N': 11, 'P': 12, 'Q': 13, 'R': 14,
-            'S': 15, 'T': 16, 'V': 17, 'W': 18, 'Y': 19,
-            'X': 20
+
+class AstroPredictor(BasePredictor):
+    def __init__(self):
+        super().__init__()
+        self.model = torch.load('app/core/models/Catboost_nn_model.pt')
+        self.model.to(self.device)
+        self.model.eval()
+
+    async def predict_stellar(self, features: List[float]) -> Dict[str, Any]:
+        features_tensor = torch.FloatTensor(features).reshape(1, -1).to(self.device)
+        with torch.no_grad():
+            prediction = self.model(features_tensor)
+        return {
+            "prediction": prediction.cpu().numpy().tolist()[0],
+            "model_type": "stellar_properties"
         }
 
-    def _load_model(self) -> HelixSynthMini:
-        model = HelixSynthMini(
-            embedding_dim=MODEL_CONFIG['embedding_dim'],
-            hidden_dim=MODEL_CONFIG['hidden_dim'],
-            num_layers=MODEL_CONFIG['num_layers']
-        )
-        model.load_state_dict(torch.load(MODEL_CONFIG['weights_path']))
-        model.to(self.device)
-        model.eval()
-        return model
+class MaterialPredictor(BasePredictor):
+    def __init__(self):
+        super().__init__()
+        self.gnn_model = torch.load("app/models/material/gnn_model.pt")
+        self.vae_model = torch.load("app/models/material/vae_model.pt")
+        self.gnn_model.to(self.device)
+        self.vae_model.to(self.device)
+        self.gnn_model.eval()
+        self.vae_model.eval()
 
-    async def predict(self, sequence: str) -> Dict[str, Any]:
-        try:
-            encoded = torch.tensor([
-                [self.aa_map.get(aa, self.aa_map['X']) for aa in sequence]
-            ], dtype=torch.long).to(self.device)
+    async def predict_gnn(self, atoms: List[List[float]], bonds: List[List[int]]) -> Dict[str, Any]:
+        atoms_tensor = torch.FloatTensor(atoms).to(self.device)
+        bonds_tensor = torch.LongTensor(bonds).to(self.device)
+        with torch.no_grad():
+            prediction = self.gnn_model(atoms_tensor, bonds_tensor)
+        return {
+            "prediction": prediction.cpu().numpy().tolist(),
+            "model_type": "material_properties"
+        }
 
-            with torch.no_grad():
-                output = self.model(encoded)
-                pred = output.argmax(dim=-1)
-                conf = torch.softmax(output, dim=-1).max(dim=-1)[0].mean()
-
-            structure = ''.join(['HEC'[i] for i in pred[0].cpu()])
-            return {
-                "structure": structure,
-                "confidence": float(conf)
-            }
-        except Exception as e:
-            logger.error(f"Prediction error: {e}")
-            raise
+    async def predict_vae(self, atoms: List[List[float]], bonds: List[List[int]]) -> Dict[str, Any]:
+        atoms_tensor = torch.FloatTensor(atoms).to(self.device)
+        bonds_tensor = torch.LongTensor(bonds).to(self.device)
+        with torch.no_grad():
+            latent = self.vae_model.encode(atoms_tensor, bonds_tensor)
+        return {
+            "embedding": latent.cpu().numpy().tolist(),
+            "model_type": "material_embedding"
+        }

@@ -1,121 +1,168 @@
-Let me add the missing sections to complete the documentation:
+# How to Use SciML Hub
 
-```markdown
-## Security Guidelines
+This guide provides step-by-step instructions for using SciML Hub's API to access machine learning models for scientific predictions.
 
-### API Key Management
-- Keep your API key secure and never expose it in client-side code
-- Rotate keys periodically (every 90 days recommended)
-- Use environment variables for key storage
-- Different keys for development and production
+## Setup and Authentication
 
-### Rate Limiting
-```python
-# Rate limits per plan
-RATE_LIMITS = {
-    'free': '100/day',
-    'pro': '1000/day',
-    'enterprise': '10000/day'
-}
-```
+1. **Install the Client Library**
+   ```python
+   # Python
+   from scimlhub import Client
+   client = Client(api_key="your_api_key")
+   ```
+   ```javascript
+   // JavaScript
+   import { SciMLClient } from '@scimlhub/client';
+   const client = new SciMLClient('your_api_key');
+   ```
+
+2. **Secure Authentication (Recommended)**
+   ```python
+   # Using environment variables
+   import os
+   client = Client(api_key=os.environ["SCIML_API_KEY"])
+   ```
+
+## Using the Astrophysics Model
+
+1. **Single Prediction**
+   ```python
+   stellar_params = {
+       "temp": 5778,        # Surface temperature (K)
+       "luminosity": 1.0,   # Solar luminosity
+       "metallicity": 0.0,  # [Fe/H]
+       "radius": 1.0        # Solar radii (optional)
+   }
+   
+   result = client.astro.predict(stellar_params)
+   ```
+
+2. **Batch Prediction**
+   ```python
+   stars = [
+       {"temp": 5778, "luminosity": 1.0, "metallicity": 0.0},
+       {"temp": 3500, "luminosity": 0.1, "metallicity": -0.5}
+   ]
+   results = client.astro.predict_batch(stars)
+   ```
+
+## Using the Materials GNN Model
+
+1. **Structure Prediction**
+   ```python
+   # Input structure in POSCAR format
+   structure_data = """
+   Direct
+   1.0
+       3.1903000763         0.0000000000         0.0000000000
+       0.0000000000         3.1903000763         0.0000000000
+       0.0000000000         0.0000000000         3.1903000763
+   Si
+   2
+   Direct
+       0.0000000000         0.0000000000         0.0000000000
+       0.5000000000         0.5000000000         0.5000000000
+   """
+   
+   result = client.materials.predict(
+       structure=structure_data,
+       properties=["band_gap", "formation_energy", "elastic_tensor"]
+   )
+   ```
+
+## Using the Molecular VAE Model
+
+1. **Generate New Molecules**
+   ```python
+   molecules = client.molecules.generate({
+       "constraints": {
+           "mol_weight": [300, 500],
+           "logP": [-1, 3],
+           "synthetic_accessibility": [1, 5],
+           "qed": [0.6, 1.0]
+       },
+       "num_samples": 5
+   })
+   ```
+
+2. **Predict Molecular Properties**
+   ```python
+   props = client.molecules.predict(
+       smiles="CC1=CC=C(C=C1)NC(=O)CN2CCN(CC2)CC(=O)NC3=CC=C(C=C3)Cl",
+       properties=["solubility", "toxicity", "binding_affinity"]
+   )
+   ```
 
 ## Error Handling
 
 ```python
-from helixsynth.client import HelixSynthClient, HelixSynthError
+from scimlhub.exceptions import (
+    InvalidInputError,
+    RateLimitError,
+    AuthenticationError
+)
 
 try:
-    client = HelixSynthClient(api_key="your_api_key")
-    result = client.predict("INVALID##SEQUENCE")
-except HelixSynthError as e:
-    if e.code == "INVALID_SEQUENCE":
-        print("Invalid amino acid sequence")
-    elif e.code == "RATE_LIMIT_EXCEEDED":
-        print("Rate limit exceeded")
-    elif e.code == "INVALID_API_KEY":
-        print("Invalid API key")
+    result = client.astro.predict({"temp": -100})
+except InvalidInputError as e:
+    print(f"Invalid input: {e}")
+except RateLimitError:
+    print("Rate limit exceeded")
+except AuthenticationError:
+    print("Invalid API key")
 ```
 
-## API Endpoints
+## Best Practices
 
-### Prediction Endpoint
-`POST /api/v1/predict`
+1. **Use Batch Processing for Multiple Predictions**
+   ```python
+   # Good
+   results = client.astro.predict_batch(stars)
+   
+   # Bad
+   results = [client.astro.predict(star) for star in stars]
+   ```
 
-Request:
-```json
-{
-    "sequence": "MLSDEDFKAV"
-}
-```
+2. **Filter by Confidence Score**
+   ```python
+   valid_results = [r for r in results if r["confidence"] > 0.9]
+   ```
 
-Response:
-```json
-{
-    "structure": "HHHEEECCC",
-    "confidence": 0.92
-}
-```
+3. **Implement Caching for Repeated Queries**
+   ```python
+   from functools import lru_cache
+   
+   @lru_cache(maxsize=1000)
+   def cached_prediction(smiles):
+       return client.molecules.predict(smiles)
+   ```
 
-### Batch Prediction
-`POST /api/v1/predict/batch`
+4. **Handle Rate Limits**
+   ```python
+   from time import sleep
+   from scimlhub.exceptions import RateLimitError
+   
+   def retry_with_backoff(func, max_retries=3):
+       for i in range(max_retries):
+           try:
+               return func()
+           except RateLimitError:
+               if i == max_retries - 1:
+                   raise
+               sleep(2 ** i)
+   ```
 
-Request:
-```json
-{
-    "sequences": [
-        "MLSDEDFKAV",
-        "KQQNLKKEKGLF"
-    ]
-}
-```
+## Plan Limitations
 
-## Performance Benchmarks
+| Plan        | Requests/Day | Batch Size | Price/Month |
+|-------------|--------------|------------|-------------|
+| Free        | 300          | 10         | $0          |
+| Premium-1K  | 1,000        | 100        | $50         |
+| Premium-5K  | 5,000        | 500        | $35         |
+| Premium-10K | 10,000       | 1,000      | $25         |
+| Enterprise  | Unlimited    | Custom     | Custom      |
 
-| Metric        | Value     |
-|---------------|-----------|
-| Accuracy (Q3) | 85.2%     |
-| Latency (p95) | 98ms      |
-| Throughput    | 100 req/s |
-| Model Size    | 25MB      |
+## Getting Support
 
-## Tests
-
-```bash
-# Run unit tests
-pytest tests/unit
-
-# Run integration tests
-pytest tests/integration
-
-# Run performance tests
-locust -f tests/locustfile.py
-```
-
-Example test:
-```python
-def test_protein_prediction():
-    client = HelixSynthClient(api_key="test_key")
-    result = client.predict("MLSDEDFKAV")
-    
-    assert len(result["structure"]) == len("MLSDEDFKAV")
-    assert result["confidence"] >= 0.0
-    assert result["confidence"] <= 1.0
-```
-
-## Deployment
-
-```bash
-# Local development
-docker-compose up -d
-
-# Production (with monitoring)
-docker-compose -f docker-compose.prod.yml up -d
-```
-
-## Architecture
-```
-HelixSynth
-├── API Layer (FastAPI)
-├── Model Layer (PyTorch)
-└── Storage Layer (Redis Cache)
-```
+- Discord Community: [Join](https://discord.gg/ncGnBwR3)
+- Enterprise Support: allanw.mk@gmail.com

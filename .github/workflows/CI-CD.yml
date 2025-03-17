@@ -7,9 +7,9 @@ on:
   pull_request:
     branches: [ main ]
 
-permissions: # Set default permissions
+permissions:
   contents: read
-  packages: write # Needed for pushing to GHCR
+  packages: write
 
 env:
   DOCKER_REGISTRY: ghcr.io
@@ -20,8 +20,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     permissions:
-      contents: read # Only needs read access
-      checks: write # For test results
+      contents: read
+      checks: write
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write # Needed for pushing container images
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx
@@ -71,7 +71,7 @@ jobs:
     needs: build-api
     runs-on: self-hosted
     permissions:
-      contents: read # Only needs read access
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: Deploy stack

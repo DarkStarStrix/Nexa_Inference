@@ -1,15 +1,22 @@
 # app/main.py
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import start_http_server
 import uvicorn
-from app.api.routes import predictions
-from app.services.auth import verify_api_key
-from app.monitoring import LATENCY
 from contextlib import contextmanager
 import time
 
-app = FastAPI(title="HelixSynth API")
+from app.api.routes import ModelPredictor
+from app.services.auth import verify_api_key
+from app.api.schemas.schemas import (
+    AstroInput,
+    MaterialInput,
+    PredictionOutput
+)
+from app.monitoring import LATENCY
+
+app = FastAPI(title="Science ML API")
+predictor = ModelPredictor()
 
 @contextmanager
 def track_latency(endpoint):
@@ -27,11 +34,34 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(predictions.router, prefix="/api/v1", dependencies=[Depends(verify_api_key)])
+@app.post("/api/v1/astro/predict", response_model=PredictionOutput)
+async def predict_astro(data: AstroInput, _=Depends(verify_api_key)):
+    with track_latency("astro_prediction"):
+        try:
+            result = await predictor.predict_astro(data.features)
+            return PredictionOutput(**result)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
 
-@app.on_event("startup")
+@app.post("/api/v1/material/gnn", response_model=PredictionOutput)
+async def predict_material_gnn(data: MaterialInput, _=Depends(verify_api_key)):
+    with track_latency("material_gnn"):
+        try:
+            result = await predictor.predict_material_gnn(data.atoms, data.bonds)
+            return PredictionOutput(**result)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/v1/material/vae", response_model=PredictionOutput)
+async def predict_material_vae(data: MaterialInput, _=Depends(verify_api_key)):
+    with track_latency("material_vae"):
+        try:
+            result = await predictor.predict_material_vae(data.atoms, data.bonds)
+            return PredictionOutput(**result)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
 async def startup_event():
-    # Start Prometheus metrics server
     start_http_server(9090)
 
 if __name__ == "__main__":

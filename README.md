@@ -1,5 +1,8 @@
 # Lambda_Zero
 
+<img src="https://github.com/user-attachments/assets/42c95527-2417-4a4d-ba21-2355901f9f8b" alt="Lambda_Zero Logo" width="200" height="200">
+
+
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![API Status](https://img.shields.io/badge/API-Live-green.svg)](https://scimlhub.com/status)
 [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://docs.scimlhub.com)
@@ -10,7 +13,7 @@
 
 ### Prerequisites
 - Python 3.9+
-- An API key (sign up at [scimlhub.com](https://scimlhub.com) to get yours)
+- An API key (Still under Dev)
 - `requests` library (`pip install requests`)
 
 ### Example: Protein Structure Prediction
@@ -215,6 +218,9 @@ X-API-Key: your_api_key
 - **Biology**: Protein design, drug discovery
 - **Astrophysics**: Stellar classification, exoplanet research
 - **Materials Science**: Material discovery, energy applications
+- **Quantum state Tomography**: Reconstructing quantum states
+- **High Energy Particle Physics**: Clustering of partcile Tracks
+- **Computational Fluid Dynamics**: Naiver Stokes and CFD sim model
 
 ## Pricing
 | Plan         | Requests/Month | Price     |
@@ -233,10 +239,6 @@ X-API-Key: your_api_key
 
 ## Enterprise Support
 For custom models, on-premise deployment, or integration help, email: [allanw.mk@gmail.com](mailto:allanw.mk@gmail.com).
-
-## Support
-- Email: [support@scimlhub.com](mailto:support@scimlhub.com)
-- Discord: [Join](https://discord.gg/scimlhub)
 
 ## License
 Commercial license - see [LICENSE](LICENSE)

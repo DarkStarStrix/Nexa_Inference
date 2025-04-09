@@ -1,10 +1,10 @@
-# SciML Hub
+# Lambda_Zero
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![API Status](https://img.shields.io/badge/API-Live-green.svg)](https://scimlhub.com/status)
 [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://docs.scimlhub.com)
 
-**SciML Hub** is a unified platform for scientific machine learning, providing state-of-the-art Nexa models for predictions in biology (protein structure), astrophysics (stellar properties), and materials science (material properties). Access these models via a simple REST API, with results returned in JSON format including predictions and confidence scores (0-100%).
+**Lambda_Zero** is a unified platform for scientific machine learning, providing state-of-the-art Nexa models for predictions in biology (protein structure), astrophysics (stellar properties), and materials science (material properties). Access these models via a simple REST API, with results returned in JSON format including predictions and confidence scores (0-100%).
 
 ## Quick Start
 

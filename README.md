@@ -12,7 +12,7 @@
 
 ### Prerequisites
 - Python 3.9+
-- An API key (sign up at [scimlhub.com](https://scimlhub.com) to get yours)
+- An API key (still in dev coming soon)
 - `requests` library (`pip install requests`)
 
 ### Example: Protein Structure Prediction

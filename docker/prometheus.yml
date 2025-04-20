@@ -1,9 +1,0 @@
-# docker/prometheus.yml
-global:
-  scrape_interval: 15s
-
-scrape_configs:
-  - job_name: 'fastapi'
-    static_configs:
-      - targets: ['api:8000']
-    metrics_path: '/metrics'

@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+  redis:
+    image: redis:6.2-alpine
+    ports:
+      - "6379:6379"

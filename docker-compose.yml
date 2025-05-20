@@ -1,16 +1,104 @@
-version: "3.8"
+version: '3.8'
+
 services:
-  app:
+  api:
     build: .
     ports:
       - "8000:8000"
     environment:
-      - SUPABASE_URL=${SUPABASE_URL}
-      - SUPABASE_KEY=${SUPABASE_KEY}
       - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=helixsynth
+      - POSTGRES_USER=helixsynth
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     depends_on:
       - redis
+      - db
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - ./models:/app/models
+
+  frontend:
+    build: ./Lambda_zero_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=http://api:8000
+    depends_on:
+      - api
+
   redis:
-    image: redis:6.2-alpine
+    image: redis:alpine
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  db:
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_DB=helixsynth
+      - POSTGRES_USER=helixsynth
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    deploy:
+      mode: global
+
+volumes:
+  redis_data:
+  postgres_data:
+  prometheus_data:
+  grafana_data:

@@ -1,0 +1,62 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'api'
+    static_configs:
+      - targets: ['api:8000']
+    metrics_path: '/metrics'
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+
+  # Node exporter for host metrics
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+alerting:
+  alertmanagers:
+    - static_configs:
+      - targets:
+        - 'alertmanager:9093'
+
+rules:
+  - name: 'api_alerts'
+    rules:
+      - alert: HighRequestLatency
+        expr: http_request_duration_seconds{quantile="0.9"} > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High request latency on {{ $labels.instance }}"
+          description: "Request latency is above 1s (current value: {{ $value }}s)"
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate on {{ $labels.instance }}"
+          description: "Error rate is above 10% (current value: {{ $value }})"
+
+      - alert: APIDown
+        expr: up{job="api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API instance down"
+          description: "API instance has been down for more than 1 minute"

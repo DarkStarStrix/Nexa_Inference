@@ -1,60 +1,78 @@
-from fastapi import FastAPI, Depends, HTTPException
-import hashlib
-import json
-from src.schemas import BiologyRequest, AstroRequest, MaterialsRequest, PredictionResponse, UserSignup
+from fastapi import FastAPI, HTTPException, Depends
+from datetime import datetime
+import logging
+from src.models import BiologyRequest, MaterialsRequest, DatasetRequest
+from src.engines import BiologyInferenceEngine, MaterialsInferenceEngine
 from src.auth import verify_api_key
-from src.config import redis_client
-from src.inference_engine import BiologyInferenceEngine, AstrophysicsInferenceEngine, MaterialsInferenceEngine
-import secrets
 
-app = FastAPI()
+app = FastAPI(title="Lambda0 API", version="1.0.0")
+logger = logging.getLogger(__name__)
 
-bio_engine = BiologyInferenceEngine("models/biology.pt")
-astro_engine = AstrophysicsInferenceEngine("models/astrophysics.pt")
-mat_engine = MaterialsInferenceEngine("models/materials.pt")
-# Initialize other engines (QST, HEP, CFD) similarly
+# Initialize model paths
+MODEL_PATHS = {
+    "bio": {
+        "1": "C:/Users/kunya/PycharmProjects/HelixSynth/models/NexaBio_1.pt",
+        "2": "C:/Users/kunya/PycharmProjects/HelixSynth/models/NexaBio_2.pt"
+    },
+    "materials": {
+        "1": "C:/Users/kunya/PycharmProjects/HelixSynth/models/NexaMat_1.pt",
+        "2": "C:/Users/kunya/PycharmProjects/HelixSynth/models/NexaMat_2.pt"
+    }
+}
 
-@app.post("/v1/bio/predict", response_model=PredictionResponse)
+# Initialize engines
+engines = {
+    "bio_1": BiologyInferenceEngine(MODEL_PATHS["bio"]["1"]),
+    "bio_2": BiologyInferenceEngine(MODEL_PATHS["bio"]["2"]),
+    "mat_1": MaterialsInferenceEngine(MODEL_PATHS["materials"]["1"]),
+    "mat_2": MaterialsInferenceEngine(MODEL_PATHS["materials"]["2"])
+}
+
+@app.get("/health")
+async def health_check():
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "models": {
+            "bio": list(MODEL_PATHS["bio"].keys()),
+            "materials": list(MODEL_PATHS["materials"].keys())
+        }
+    }
+
+@app.post("/api/predict/bio")
 async def predict_bio(request: BiologyRequest, _=Depends(verify_api_key)):
-    cache_key = hashlib.sha256(request.sequence.encode()).hexdigest()
-    cached = redis_client.get(cache_key)
-    if cached:
-        return json.loads(cached)
-    result = bio_engine.predict(request.sequence)
-    redis_client.set(cache_key, json.dumps(result), ex=3600)
-    return result
+    try:
+        engine = engines[f"bio_{request.model_version}"]
+        result = engine.predict({
+            "sequence": request.sequence,
+            "confidence_threshold": request.confidence_threshold
+        })
+        return {
+            "model": f"NexaBio_{request.model_version}",
+            "predictions": result["predictions"],
+            "confidence_scores": result["confidence_scores"]
+        }
+    except Exception as e:
+        logger.error(f"Biology prediction failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/v1/astro/predict", response_model=PredictionResponse)
-async def predict_astro(request: AstroRequest, _=Depends(verify_api_key)):
-    input_str = f"{request.temp}{request.luminosity}{request.metallicity}"
-    cache_key = hashlib.sha256(input_str.encode()).hexdigest()
-    cached = redis_client.get(cache_key)
-    if cached:
-        return json.loads(cached)
-    result = astro_engine.predict(request.dict())
-    redis_client.set(cache_key, json.dumps(result), ex=3600)
-    return result
-
-@app.post("/v1/materials/predict", response_model=PredictionResponse)
+@app.post("/api/predict/materials")
 async def predict_materials(request: MaterialsRequest, _=Depends(verify_api_key)):
-    cache_key = hashlib.sha256(request.structure.encode()).hexdigest()
-    cached = redis_client.get(cache_key)
-    if cached:
-        return json.loads(cached)
-    result = mat_engine.predict(request.structure)
-    redis_client.set(cache_key, json.dumps(result), ex=3600)
-    return result
+    try:
+        engine = engines[f"mat_{request.model_version}"]
+        result = engine.predict({
+            "structure": request.structure,
+            "energy_threshold": request.energy_threshold
+        })
+        return {
+            "model": f"NexaMat_{request.model_version}",
+            "predictions": result["predictions"],
+            "confidence_scores": result["confidence_scores"]
+        }
+    except Exception as e:
+        logger.error(f"Materials prediction failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/signup")
-async def signup(user: UserSignup):
-    existing = supabase.table("users").select("*").eq("email", user.email).execute()
-    if existing.data:
-        raise HTTPException(status_code=400, detail="User already exists")
-    api_key = secrets.token_urlsafe(32)
-    supabase.table("users").insert({
-        "email": user.email,
-        "tier": user.plan,
-        "api_key": api_key,
-        "requests_used": 0
-    }).execute()
-    return {"api_key": api_key}
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

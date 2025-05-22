@@ -1,7 +1,3 @@
-import pytest
-from fastapi.testclient import TestClient
-
-
 def test_predict_bio_endpoint(client):
     """Test biology prediction endpoint."""
     response = client.post (

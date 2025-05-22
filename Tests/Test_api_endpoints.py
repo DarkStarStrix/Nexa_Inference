@@ -1,92 +1,91 @@
-# tests/test_api_endpoints.py
-import pytest
-from fastapi.testclient import TestClient
-from src.main import app
+from fastapi import status
 
-client = TestClient(app)
+SAMPLE_PROTEIN_REQUEST = {
+    "sequence": "AAAA",
+    "confidence_threshold": 0.8,
+    "model_version": "NexaBio_2"
+}
 
-def test_protein_secondary_structure():
-    """Test the CNN+BiLSTM secondary structure prediction endpoint"""
-    test_data = {
-        "sequence": "MLPGLALLLLAAWTARALEVPTDGNAGLLAEPQIAMFCGRLNMHMNVQNGKWDSDPSGTKTCIDTKEGILQYCQEVYPELQITNVVEANQPVTIQNWCKRGRKQCKTHPHFVIPYRCLVGEFVSDALLVPDKCKFLHQERMDVCETHLHWHTVAKETCSEKSTNLHDYGMLLPCGIDKFRGVEFVCCPLAEESDNVDSADAEEDDSDVWWGGADTDYADGSEDKVVEVAEEEEVAEVEEEEADDDEDDEDGDEVEEEAEEPYEEATERTTSIATTTTTTTESVEEVVREVCSEQAETGPCRAMISRWYFDVTEGKCAPFFYGGCGGNRNNFDTEEYCMAVCGSAMSQSLLKTTQEPLARDPVKLPTTAASTPDAVDKYLETPGDENEHAHFQKAKERLEAKHRERMSQVMREWEEAERQAKNLPKADKKAVIQHFQEKVESLEQEAANERQQLVETHMARVEAMLNDRRRLALENYITALQAVPPRPRHVFNMLKKYVRAEQKDRQHTLKHFEHVRMVDPKKAAQIRSQVMTHLRVIYERMNQSLSLLYNVPAVAEEIQDEVDELLQKEQNYSDDVLANMISEPRISYGNDALMPSLTETKTTVELLPVNGEFSLDDLQPWHSFGADSVPANTENEVEPVDARPAADRGLTTRPGSGLTNIKTEEISEVKMDAEFRHDSGYEVHHQKLVFFAEDVGSNKGAIIGLMVGGVVIATVIVITLVMLKKKQYTSIHHGVVEVDAAVTPEERHLSKMQQNGYENPTYKFFEQMQN",
-        "confidence_threshold": 0.8
-    }
-
-    response = client.post("/api/bio/secondary-structure", json=test_data)
-    assert response.status_code == 200
-    assert "predictions" in response.json()
-    assert "confidence_scores" in response.json()
-
-def test_protein_tertiary_structure():
-    """Test the VAE+Diffusion tertiary structure prediction endpoint"""
-    test_data = {
-        "sequence": "MLPGLALLLL",
-        "num_samples": 1
-    }
-
-    response = client.post("/api/bio/tertiary-structure", json=test_data)
-    assert response.status_code == 200
-    assert "structure_predictions" in response.json()
-    assert "ranking_scores" in response.json()
-
-def test_materials_dft():
-    """Test the NexaMat DFT calculations endpoint"""
-    test_data = {
-        "structure": {
-            "lattice": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
-            "species": ["Si", "Si"],
-            "positions": [[0.0, 0.0, 0.0], [0.25, 0.25, 0.25]]
+SAMPLE_PROTEIN_BATCH = {
+    "requests": [
+        {
+            "sequence": "AAAA",
+            "model_version": "NexaBio_1"
         },
-        "calculation_type": "band_structure"
+        {
+            "sequence": "AAAA",
+            "model_version": "NexaBio_2"
+        }
+    ]
+}
+
+def test_health_check(test_client):
+    """Test API health"""
+    response = test_client.get("/health")
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert data["status"] == "healthy"
+    assert "bio" in data["models"]
+
+def test_protein_structure_prediction(test_client, valid_headers):
+    """Test protein structure prediction endpoint"""
+    response = test_client.post(
+        "/api/bio/predict",
+        json=SAMPLE_PROTEIN_REQUEST,
+        headers=valid_headers
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert "predictions" in data
+    assert "confidence_scores" in data
+    assert len(data["predictions"]) == len(SAMPLE_PROTEIN_REQUEST["sequence"])
+
+def test_protein_batch_prediction(test_client, valid_headers):
+    """Test batch protein structure prediction"""
+    response = test_client.post(
+        "/api/bio/batch-predict",
+        json=SAMPLE_PROTEIN_BATCH,
+        headers=valid_headers
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert "results" in data
+    assert len(data["results"]) == len(SAMPLE_PROTEIN_BATCH["requests"])
+
+    for result in data["results"]:
+        assert "predictions" in result
+        assert "confidence_scores" in result
+
+def test_invalid_protein_structure_prediction(test_client, valid_headers):
+    """Test invalid protein structure prediction"""
+    invalid_request = {
+        "sequence": "INVALID_SEQUENCE",
+        "confidence_threshold": 0.8,
+        "model_version": "NexaBio_2"
     }
 
-    response = client.post("/api/materials/dft", json=test_data)
-    assert response.status_code == 200
-    assert "energy" in response.json()
-    assert "band_structure" in response.json()
+    response = test_client.post(
+        "/api/bio/predict",
+        json=invalid_request,
+        headers=valid_headers
+    )
 
-def test_qst_fidelity():
-    """Test the QST fidelity calculation endpoint"""
-    test_data = {
-        "quantum_state": {
-            "type": "pure",
-            "vector": [0.707, 0, 0, 0.707]
-        },
-        "measurement_basis": "pauli"
-    }
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    data = response.json()
+    assert "detail" in data
+    assert "Invalid sequence characters" in data["detail"][0]["msg"]
 
-    response = client.post("/api/quantum/fidelity", json=test_data)
-    assert response.status_code == 200
-    assert "fidelity" in response.json()
-    assert "confidence_interval" in response.json()
-    assert "error" in response.json()
+def materials_prediction(test_client, valid_headers):
+    """Test materials prediction endpoint"""
+    response = test_client.post(
+        "/api/materials/predict",
+        json={"data": "test_data"},
+        headers=valid_headers
+    )
 
-def test_qst_quantum_state():
-    """Test the QST quantum state preparation endpoint"""
-    test_data = {
-        "target_state": {
-            "type": "mixed",
-            "density_matrix": [[0.5, 0], [0, 0.5]]
-        },
-        "preparation_method": "adiabatic"
-    }
-
-    response = client.post("/api/quantum/state-preparation", json=test_data)
-    assert response.status_code == 200
-    assert "prepared_state" in response.json()
-    assert "success" in response.json()
-
-def test_qst_quantum_error_correction():
-    """Test the QST quantum error correction endpoint"""
-    test_data = {
-        "quantum_state": {
-            "type": "mixed",
-            "density_matrix": [[0.5, 0], [0, 0.5]]
-        },
-        "error_correction_method": "surface_code"
-    }
-
-    response = client.post("/api/quantum/error-correction", json=test_data)
-    assert response.status_code == 200
-    assert "corrected_state" in response.json()
-    assert "success" in response.json()
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert "prediction" in data
+    assert data["prediction"] == "test_prediction"

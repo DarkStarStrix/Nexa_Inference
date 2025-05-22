@@ -14,3 +14,10 @@ seaborn~=0.13.2
 tqdm~=4.67.1
 scipy~=1.15.2
 python-jose~=3.4.0
+bio~=1.7.1
+biopython~=1.85
+gotrue~=2.11.4
+httpx>=0.24.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.10.0
+

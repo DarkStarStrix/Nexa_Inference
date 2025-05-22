@@ -1,6 +1,9 @@
+import os
+
 import pytest
+import torch
+
 from src.inference_engine import (
-    ModelVersionManager,
     BiologyInferenceEngine,
     AstrophysicsInferenceEngine,
     MaterialsInferenceEngine,
@@ -8,8 +11,7 @@ from src.inference_engine import (
     InputValidationError,
     VersionNotFoundError
 )
-import torch
-import os
+
 
 class TestModelVersionManager:
     def test_initialization(self, model_manager):
@@ -27,23 +29,23 @@ class TestModelVersionManager:
         assert len(models["NexaAstro"]) == 1
 
     def test_get_model_path(self, model_manager, temp_model_dir):
-        """Test getting model path."""
+        """Test getting a model path."""
         path = model_manager.get_model_path("NexaBio", "1")
         assert path == os.path.join(temp_model_dir, "NexaBio_1.pt")
         assert os.path.exists(path)
 
     def test_get_latest_version(self, model_manager):
-        """Test getting latest version of a model."""
+        """Test getting the latest version of a model."""
         path = model_manager.get_model_path("NexaBio")  # No version specified
         assert "NexaBio_2.pt" in path  # Should get version 2 as it's latest
 
     def test_nonexistent_model(self, model_manager):
-        """Test handling of nonexistent model."""
+        """Test handling of a nonexistent model."""
         with pytest.raises(ModelNotFoundError):
             model_manager.get_model_path("NonexistentModel")
 
     def test_nonexistent_version(self, model_manager):
-        """Test handling of nonexistent version."""
+        """Test handling of a nonexistent version."""
         with pytest.raises(VersionNotFoundError):
             model_manager.get_model_path("NexaBio", "999")
 

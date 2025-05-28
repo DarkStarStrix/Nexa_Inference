@@ -21,3 +21,7 @@ httpx>=0.24.0
 pytest-asyncio>=0.21.0
 pytest-mock>=3.10.0
 
+
+streamlit~=1.45.1
+py3Dmol~=2.4.2
+stmol~=0.0.9

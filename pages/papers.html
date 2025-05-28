@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lambda0.ai - Research Papers & Publications</title>
+  <link rel="stylesheet" href="../styles/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <style>
+    .papers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .paper-card {
+      background: linear-gradient(145deg, rgba(0, 255, 255, 0.05), rgba(0, 255, 255, 0.02));
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      padding: 2rem;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .paper-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 255, 255, 0.3);
+    }
+
+    .paper-meta {
+      font-size: 0.9rem;
+      color: rgba(0, 255, 255, 0.8);
+      margin: 1rem 0;
+    }
+
+    .paper-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .tag {
+      background: rgba(0, 255, 255, 0.1);
+      padding: 0.3rem 0.8rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      color: #00FFFF;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 1rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .filter-button {
+      background: rgba(0, 255, 255, 0.1);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      color: #FAFAFA;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .filter-button:hover,
+    .filter-button.active {
+      background: rgba(0, 255, 255, 0.2);
+      border-color: #00FFFF;
+    }
+
+    .links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .link-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #00FFFF;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.3s ease;
+    }
+
+    .link-button:hover {
+      color: #FAFAFA;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="logo">
+      <a href="../Lambda0.html"><img src="../Lambda0-logo.png" alt="Lambda0.ai Logo"></a>
+    </div>
+    <nav>
+      <a href="../Lambda0.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="system.html">System</a>
+      <a href="join.html">Join</a>
+      <a href="papers.html">Papers</a>
+      <a href="vision.html">Vision</a>
+    </nav>
+  </div>
+
+  <canvas id="backgroundCanvas"></canvas>
+
+  <div class="container">
+    <section class="section">
+      <h1>Research Papers & Publications</h1>
+
+      <div class="card">
+        <p>Every research output from Lambda0 — whether it's a model, a new scientific formulation, or a novel technique — is open-sourced, peer-reviewed, and published here with complete reproducibility.</p>
+      </div>
+
+      <div class="filter-bar">
+        <button class="filter-button active">All</button>
+        <button class="filter-button">Quantum Systems</button>
+        <button class="filter-button">Biology</button>
+        <button class="filter-button">Climate Science</button>
+        <button class="filter-button">Materials</button>
+        <button class="filter-button">Infrastructure</button>
+      </div>
+
+      <div class="papers-grid">
+        <div class="paper-card">
+          <h3>Quantum State Tomography via Deep Learning</h3>
+          <div class="paper-meta">
+            Published: May 2025 | Citations: 42
+          </div>
+          <p>Novel approach to quantum state reconstruction using advanced neural architectures and distributed computing.</p>
+          <div class="paper-tags">
+            <span class="tag">Quantum</span>
+            <span class="tag">Deep Learning</span>
+            <span class="tag">PyTorch</span>
+          </div>
+          <div class="links">
+            <a href="#" class="link-button">📄 PDF</a>
+            <a href="#" class="link-button">💻 Code</a>
+            <a href="#" class="link-button">🔍 Data</a>
+          </div>
+        </div>
+
+        <div class="paper-card">
+          <h3>Distributed Training for Protein Folding</h3>
+          <div class="paper-meta">
+            Published: April 2025 | Citations: 31
+          </div>
+          <p>Scalable approach to protein structure prediction using the Singularity Cluster architecture.</p>
+          <div class="paper-tags">
+            <span class="tag">Biology</span>
+            <span class="tag">HPC</span>
+            <span class="tag">PyTorch</span>
+          </div>
+          <div class="links">
+            <a href="#" class="link-button">📄 PDF</a>
+            <a href="#" class="link-button">💻 Code</a>
+            <a href="#" class="link-button">🔍 Data</a>
+          </div>
+        </div>
+
+        <div class="paper-card">
+          <h3>PySE: Python Speed Evolution</h3>
+          <div class="paper-meta">
+            Published: March 2025 | Citations: 89
+          </div>
+          <p>Technical overview of the PySE system for accelerating Python-based scientific computing.</p>
+          <div class="paper-tags">
+            <span class="tag">Infrastructure</span>
+            <span class="tag">Performance</span>
+            <span class="tag">CUDA</span>
+          </div>
+          <div class="links">
+            <a href="#" class="link-button">📄 PDF</a>
+            <a href="#" class="link-button">💻 Code</a>
+            <a href="#" class="link-button">📊 Benchmarks</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Publication Standards</h2>
+        <ul class="feature-list">
+          <li>Complete code reproducibility</li>
+          <li>Open datasets and methods</li>
+          <li>Comprehensive documentation</li>
+          <li>Performance benchmarks</li>
+          <li>Community peer review</li>
+        </ul>
+      </div>
+
+      <div class="card" style="text-align: center;">
+        <h2>Submit Your Research</h2>
+        <p>Have a paper that aligns with Lambda0's mission?</p>
+        <div style="margin-top: 2rem;">
+          <a href="#submit" class="cta-button">Submit Paper</a>
+          <a href="#guidelines" class="cta-button">View Guidelines</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <div class="logo">
+      <img src="../Lambda0-logo.png" alt="Lambda0.ai Logo">
+    </div>
+    <div>
+      <a href="ethics.html">Code of Ethics</a>
+      <a href="credits.html">Contributor Credits</a>
+      <a href="https://github.com/lambda0-ai" target="_blank">GitHub</a>
+      <a href="docs.html">Documentation</a>
+      <a href="https://discord.gg/lambda0" target="_blank">Discord</a>
+    </div>
+    <p>© 2025 Lambda0.ai</p>
+  </footer>
+
+  <script src="../scripts/background.js"></script>
+</body>
+</html>
+

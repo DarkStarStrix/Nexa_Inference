@@ -1,0 +1,263 @@
+/* Base styles from Lambda0.html */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background: linear-gradient(to bottom, #0a0f1f, #0f172a);
+  color: #FAFAFA;
+  overflow-x: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0.7;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  margin-top: 70px;
+  padding: 2rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Navbar styles */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(15, 23, 42, 1);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid #00FFFF;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1.2rem;
+  z-index: 2;
+  min-height: 56px;
+}
+
+.navbar .logo img {
+  max-width: 110px;
+  height: auto;
+  transition: filter 0.3s, transform 0.3s;
+  display: block;
+}
+
+.navbar .logo img:hover {
+  filter: drop-shadow(0 0 10px #00FFFF);
+  transform: rotate(5deg);
+}
+
+.navbar nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.navbar nav a {
+  color: #FAFAFA;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.3s, text-shadow 0.3s;
+  letter-spacing: 0.3px;
+  padding: 0.5rem 0;
+  position: relative;
+}
+
+.navbar nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #00FFFF;
+  transition: width 0.3s ease;
+}
+
+.navbar nav a:hover::after {
+  width: 100%;
+}
+
+.navbar nav a:hover {
+  color: #00FFFF;
+}
+
+.navbar nav a.active {
+  color: #00FFFF;
+}
+
+.navbar nav a.active::after {
+  width: 100%;
+}
+
+/* Section styles */
+.section {
+  padding: 4rem 0;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Typography */
+h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  background: linear-gradient(180deg, #FAFAFA, #00FFFF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1.5rem;
+  line-height: 1.1;
+}
+
+h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(180deg, #FAFAFA, #00FFFF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.8rem;
+  color: #00FFFF;
+  margin-bottom: 1rem;
+}
+
+p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: rgba(250, 250, 250, 0.9);
+  margin-bottom: 1.5rem;
+}
+
+/* Cards */
+.card {
+  background: linear-gradient(145deg, rgba(0, 255, 255, 0.05), rgba(0, 255, 255, 0.02));
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  padding: 2rem;
+  border-radius: 12px;
+  transition: box-shadow 0.3s, transform 0.3s;
+  margin-bottom: 2rem;
+}
+
+.card:hover {
+  box-shadow: 0 8px 25px rgba(0, 255, 255, 0.3);
+  transform: translateY(-5px);
+}
+
+/* Lists */
+.feature-list {
+  list-style: none;
+  margin: 2rem 0;
+}
+
+.feature-list li {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: rgba(250, 250, 250, 0.9);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.feature-list li::before {
+  content: "✓";
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  background: rgba(0, 255, 255, 0.1);
+  border-radius: 50%;
+  color: #00FFFF;
+}
+
+/* Footer */
+footer {
+  background: #0f172a;
+  border-top: 2px solid #00FFFF;
+  padding: 3rem 2rem;
+  text-align: center;
+  margin-top: 3rem;
+}
+
+footer .logo img {
+  max-width: 120px;
+  margin-bottom: 2rem;
+  filter: drop-shadow(0 0 5px #00FFFF);
+}
+
+footer a {
+  color: #FAFAFA;
+  margin: 0 1.5rem;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+footer a:hover {
+  color: #00FFFF;
+  text-shadow: 0 0 8px #00FFFF;
+}
+
+footer p {
+  margin-top: 2rem;
+  font-size: 0.95rem;
+  color: #FAFAFA;
+  font-weight: 400;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0.5rem 0.7rem;
+  }
+
+  .navbar .logo img {
+    max-width: 80px;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  .container {
+    padding: 1rem;
+  }
+
+  .section {
+    padding: 3rem 0;
+  }
+
+  footer a {
+    margin: 0 0.5rem;
+    font-size: 0.9rem;
+  }
+}

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lambda0.ai - System Architecture</title>
+  <link rel="stylesheet" href="../styles/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <style>
+    .system-architecture {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .tech-stack {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: #00FFFF;
+      margin-top: 1rem;
+      padding: 0.5rem;
+      background: rgba(0, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+
+    .diagram {
+      margin: 3rem 0;
+      padding: 2rem;
+      background: rgba(0, 255, 255, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .metric {
+      text-align: center;
+      padding: 1.5rem;
+      background: rgba(0, 255, 255, 0.05);
+      border-radius: 8px;
+    }
+
+    .metric-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #00FFFF;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="logo">
+      <a href="../Lambda0.html"><img src="../Lambda0-logo.png" alt="Lambda0.ai Logo"></a>
+    </div>
+    <nav>
+      <a href="../Lambda0.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="system.html">System</a>
+      <a href="join.html">Join</a>
+      <a href="papers.html">Papers</a>
+      <a href="vision.html">Vision</a>
+    </nav>
+  </div>
+
+  <canvas id="backgroundCanvas"></canvas>
+
+  <div class="container">
+    <section class="section">
+      <h1>The Infrastructure of Scientific Intelligence</h1>
+
+      <div class="card">
+        <p>At the heart of Lambda0 is a modular system stack designed to turn distributed intelligence into coordinated, validated, scalable science. Each subsystem operates independently, but together they form a complete scientific intelligence platform.</p>
+      </div>
+
+      <div class="system-architecture">
+        <div class="card">
+          <h3>Lambda0 Arc</h3>
+          <p>Our foundational research and scientific problem structuring engine. Where scientific ML begins.</p>
+          <ul class="feature-list">
+            <li>Problem formalization</li>
+            <li>Dataset standardization</li>
+            <li>Experimental protocols</li>
+          </ul>
+          <div class="tech-stack">
+            Python | PyTorch | JAX | NumPy
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>PySE</h3>
+          <p>The infrastructure toolchain that accelerates model training and experiment orchestration.</p>
+          <ul class="feature-list">
+            <li>Python acceleration</li>
+            <li>Distributed training</li>
+            <li>Custom CUDA kernels</li>
+          </ul>
+          <div class="tech-stack">
+            CUDA | C++ | LLVM | TensorRT
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Lambda0 Inference</h3>
+          <p>Our public portal for AI model deployment and integration into production pipelines.</p>
+          <ul class="feature-list">
+            <li>Containerized deployment</li>
+            <li>API integration</li>
+            <li>Version control</li>
+          </ul>
+          <div class="tech-stack">
+            Docker | Kubernetes | FastAPI | ONNX
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Singularity Cluster</h3>
+          <p>A global mesh network of contributor compute resources working together.</p>
+          <ul class="feature-list">
+            <li>Distributed computing</li>
+            <li>Resource scheduling</li>
+            <li>Usage tracking</li>
+          </ul>
+          <div class="tech-stack">
+            Ray | Kubernetes | Prometheus | Grafana
+          </div>
+        </div>
+      </div>
+
+      <div class="diagram">
+        <h2>System Metrics</h2>
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-value">10PF+</div>
+            <p>Combined Computing Power</p>
+          </div>
+          <div class="metric">
+            <div class="metric-value">100+</div>
+            <p>Active Models</p>
+          </div>
+          <div class="metric">
+            <div class="metric-value">50TB+</div>
+            <p>Scientific Datasets</p>
+          </div>
+          <div class="metric">
+            <div class="metric-value">1000+</div>
+            <p>Global Contributors</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Verification & Governance</h2>
+        <p>Every component in our system stack is subject to rigorous verification:</p>
+        <ul class="feature-list">
+          <li>Automated testing and validation</li>
+          <li>Peer review of core algorithms</li>
+          <li>Performance benchmarking</li>
+          <li>Security auditing</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <div class="logo">
+      <img src="../Lambda0-logo.png" alt="Lambda0.ai Logo">
+    </div>
+    <div>
+      <a href="ethics.html">Code of Ethics</a>
+      <a href="credits.html">Contributor Credits</a>
+      <a href="https://github.com/lambda0-ai" target="_blank">GitHub</a>
+      <a href="docs.html">Documentation</a>
+      <a href="https://discord.gg/lambda0" target="_blank">Discord</a>
+    </div>
+    <p>© 2025 Lambda0.ai</p>
+  </footer>
+
+  <script src="../scripts/background.js"></script>
+</body>
+</html>
+

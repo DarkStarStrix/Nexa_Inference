@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lambda0.ai - Scientific Intelligence at Scale</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to bottom, #0a0f1f, #0f172a);
+      color: #FAFAFA;
+      overflow-x: hidden;
+      font-family: 'Inter', sans-serif;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      opacity: 0.7;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      margin-top: 70px; /* Adjust based on navbar height */
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(15, 23, 42, 1);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid #00FFFF;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 1.2rem; /* Reduced padding */
+      z-index: 2;
+      min-height: 56px; /* Ensure minimum height for header */
+    }
+
+    .navbar .logo img {
+      max-width: 110px; /* Smaller logo for header */
+      height: auto;
+      transition: filter 0.3s, transform 0.3s;
+      display: block;
+    }
+
+    .navbar .logo img:hover {
+      filter: drop-shadow(0 0 10px #00FFFF);
+      transform: rotate(5deg);
+    }
+
+    .navbar nav {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .navbar nav a {
+      color: #FAFAFA;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.3s, text-shadow 0.3s;
+      letter-spacing: 0.3px;
+      padding: 0.5rem 0;
+      position: relative;
+    }
+
+    .navbar nav a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #00FFFF;
+      transition: width 0.3s ease;
+    }
+
+    .navbar nav a:hover::after {
+      width: 100%;
+    }
+
+    .navbar nav a:hover {
+      color: #00FFFF;
+    }
+
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 700;
+      background: linear-gradient(180deg, #FAFAFA, #00FFFF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1.5rem;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+    }
+
+    .hero .subtext {
+      font-size: 1.25rem;
+      margin-bottom: 1.5rem;
+      font-weight: 400;
+      max-width: 600px;
+      line-height: 1.6;
+      color: rgba(250, 250, 250, 0.8);
+    }
+
+    .hero .highlight {
+      font-style: italic;
+      font-size: 1.1rem;
+      margin-bottom: 2.5rem;
+      max-width: 700px;
+      line-height: 1.6;
+      color: rgba(250, 250, 250, 0.7);
+    }
+
+    .hero .checkmarks {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      max-width: 800px;
+      width: 100%;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero .checkmarks p {
+      font-size: 0.95rem;
+      color: #00FFFF;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+    }
+
+    .hero .checkmarks p::before {
+      content: "✓";
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 24px;
+      height: 24px;
+      background: rgba(0, 255, 255, 0.1);
+      border-radius: 50%;
+      color: #00FFFF;
+    }
+
+    .hero .quote {
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      background: rgba(0, 255, 255, 0.05);
+      padding: 1.5rem;
+      border-radius: 8px;
+      font-style: italic;
+      margin-bottom: 2.5rem;
+      max-width: 700px;
+      color: rgba(250, 250, 250, 0.9);
+      font-weight: 400;
+      position: relative;
+    }
+
+    .hero .quote::before {
+      content: """;
+      position: absolute;
+      top: 0;
+      left: 0;
+      font-size: 4rem;
+      color: rgba(0, 255, 255, 0.2);
+      line-height: 1;
+      transform: translate(10px, 10px);
+    }
+
+    .hero .ctas {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .hero .cta {
+      padding: 0.8rem 1.8rem;
+      border: 1px solid rgba(0, 255, 255, 0.5);
+      color: #FAFAFA;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.3s;
+      font-weight: 500;
+      font-size: 0.9rem;
+      backdrop-filter: blur(10px);
+      letter-spacing: 0.5px;
+    }
+
+    .hero .cta:first-child {
+      background: rgba(0, 255, 255, 0.1);
+    }
+
+    .hero .cta:hover {
+      background: rgba(0, 255, 255, 0.2);
+      border-color: #00FFFF;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .equation {
+      position: absolute;
+      color: rgba(0, 255, 255, 0.7);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+      transition: opacity 1s;
+    }
+
+    .section {
+      padding: 6rem 2rem;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      border-top: 2px solid rgba(0, 255, 255, 0.4);
+      margin: 3rem 0;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.3);
+    }
+
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(180deg, #FAFAFA, #00FFFF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 2rem;
+    }
+
+    p {
+      max-width: 800px;
+      margin: 0 auto 1rem;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: rgba(250, 250, 250, 0.9);
+    }
+
+    ul {
+      list-style: none;
+      max-width: 600px;
+      margin: 1rem auto;
+      text-align: left;
+    }
+
+    ul li {
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+      color: rgba(250, 250, 250, 0.9);
+    }
+
+    ul li::before {
+      content: "✓";
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 24px;
+      height: 24px;
+      background: rgba(0, 255, 255, 0.1);
+      border-radius: 50%;
+      color: #00FFFF;
+      margin-right: 0.5rem;
+    }
+
+    .highlight {
+      font-style: italic;
+      color: rgba(250, 250, 250, 0.7);
+      margin: 1rem auto;
+      max-width: 700px;
+    }
+
+    .system-grid, .join-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 2rem auto;
+      transition: transform 0.5s ease;
+    }
+
+    .system-grid .card, .join-grid .card {
+      opacity: 0;
+      transform: scale(0.9) translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .system-grid .card.visible, .join-grid .card.visible {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+
+    .card {
+      background: linear-gradient(145deg, rgba(0, 255, 255, 0.05), rgba(0, 255, 255, 0.02));
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      padding: 2rem;
+      border-radius: 12px;
+      transition: box-shadow 0.3s, transform 0.3s;
+      text-align: left;
+      box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1);
+    }
+
+    .card:hover {
+      box-shadow: 0 8px 25px rgba(0, 255, 255, 0.3);
+      transform: translateY(-5px);
+    }
+
+    .card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      color: #00FFFF;
+      margin-bottom: 1rem;
+    }
+
+    .incentives table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 600px;
+      margin: 2rem auto;
+      background: rgba(0, 255, 255, 0.02);
+    }
+
+    .incentives th, .incentives td {
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      padding: 1rem;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    .incentives th {
+      background: rgba(0, 255, 255, 0.05);
+      color: #00FFFF;
+    }
+
+    .join .cta {
+      padding: 0.8rem 1.8rem;
+      border: 1px solid rgba(0, 255, 255, 0.5);
+      color: #FAFAFA;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.3s;
+      font-weight: 500;
+      font-size: 0.9rem;
+      backdrop-filter: blur(10px);
+      letter-spacing: 0.5px;
+      margin: 0.5rem;
+    }
+
+    .join .cta:hover {
+      background: rgba(0, 255, 255, 0.2);
+      border-color: #00FFFF;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    footer {
+      background: #0f172a;
+      border-top: 2px solid #00FFFF;
+      padding: 3rem 2rem;
+      text-align: center;
+      margin-top: 3rem;
+    }
+
+    footer .logo img {
+      max-width: 120px;
+      margin-bottom: 2rem;
+      filter: drop-shadow(0 0 5px #00FFFF);
+    }
+
+    footer a {
+      color: #FAFAFA;
+      margin: 0 1.5rem;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: color 0.3s, text-shadow 0.3s;
+    }
+
+    footer a:hover {
+      color: #00FFFF;
+      text-shadow: 0 0 8px #00FFFF;
+    }
+
+    footer p {
+      margin-top: 2rem;
+      font-size: 0.95rem;
+      color: #FAFAFA;
+      font-weight: 400;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0.5rem 0.7rem;
+        min-height: 44px;
+      }
+
+      .navbar .logo img {
+        max-width: 80px;
+      }
+
+      .container {
+        margin-top: 56px;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero .subtext {
+        font-size: 1rem;
+      }
+
+      .hero .checkmarks {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        padding: 4rem 1rem;
+      }
+
+      .system-grid, .join-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="navbar">
+    <div class="logo">
+      <img src="lambda0-logo.png" alt="Lambda0.ai Logo">
+    </div>
+    <nav>
+      <a href="#home">Home</a>
+      <a href="pages/about.html">About</a>
+      <a href="pages/system.html">System</a>
+      <a href="pages/join.html">Join</a>
+      <a href="pages/papers.html">Papers</a>
+      <a href="pages/vision.html">Vision</a>
+    </nav>
+  </div>
+
+  <canvas id="backgroundCanvas"></canvas>
+
+  <div class="container">
+    <div class="hero section" id="home">
+      <div class="section-content">
+        <h1>Scientific Intelligence at Scale</h1>
+        <p class="subtext">Welcome to Lambda0 — a radical new system for doing science.</p>
+        <p class="highlight">What if AI wasn’t just a tool for science — but the system through which we scale discovery itself?</p>
+        <div class="checkmarks">
+          <p>Foundational Research</p>
+          <p>Open-Source Infrastructure</p>
+          <p>AI-First Scientific Discovery</p>
+          <p>Global Collaboration at Scale</p>
+        </div>
+        <div class="quote">If you believe in radically transparent Science technical excellence and benefiting humanity and building the future you're in </div>
+        <div class="ctas">
+          <a href="#join" class="cta">Join the Collective</a>
+          <a href="#about" class="cta">Explore the Vision</a>
+          <a href="#system" class="cta">See the Architecture</a>
+        </div>
+      </div>
+    </div>
+
+    <section id="about" class="section">
+      <div class="section-content">
+        <h2>The Mission</h2>
+        <p>Lambda0 is an open scientific collective. We coordinate researchers, engineers, and compute resources to build AI models that solve real scientific problems — and then deploy them at scale through commercial, non-profit, and public pathways.</p>
+        <p>We operate on:</p>
+        <ul>
+          <li>Integrity: Radical transparency, scientific rigor, ethical alignment.</li>
+          <li>Technical Excellence: No fluff. Just verifiable, replicable work that moves the frontier.</li>
+          <li>Humanity-first impact: From seabed mapping to quantum simulation — we build for planetary benefit.</li>
+        </ul>
+        <p class="highlight">Whether you’re a Berlin physicist, a Cape Town engineer, or a Chilean biologist — if you meet the bar, this is your collective.</p>
+      </div>
+    </section>
+
+    <section id="system" class="section">
+      <div class="section-content">
+        <h2>Components of Lambda0</h2>
+        <div class="system-grid">
+          <div class="card" style="transition-delay: 0.1s;">
+            <h3>Lambda0Arc</h3>
+            <p>AI-native research lab. We identify foundational scientific challenges and solve them with novel ML systems and benchmarks.</p>
+            <p>Outputs: .csv datasets, .pt / .onnx models, and reproducible pipelines.</p>
+          </div>
+          <div class="card" style="transition-delay: 0.2s;">
+            <h3>Lambda0 Inference</h3>
+            <p>Model serving + inference infrastructure. Containerized delivery of validated models into industrial pipelines (e.g., seabed mining, biological simulation).</p>
+          </div>
+          <div class="card" style="transition-delay: 0.3s;">
+            <h3>PyC</h3>
+            <p> An AI Compiler toolchain to speed up Python-based ML workflows. Optimized for Tensor Graph optimization and speeding up AI workflows with custom cuda Kernels.</p>
+          </div>
+          <div class="card" style="transition-delay: 0.4s;">
+            <h3>Singularity Cluster</h3>
+            <p>Distributed compute collective. Run training/inference across shared and personal GPU resources. Your lab, your home, your cluster — connected.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="incentives" class="incentives section">
+      <div class="section-content">
+        <h2>Incentives & Governance</h2>
+        <p>We reward the contribution. The more you help — compute, research, validate, build — the more you share in the output.</p>
+        <table>
+          <tr>
+            <th>Allocation</th>
+            <th>Percentage</th>
+          </tr>
+          <tr>
+            <td>Lambda0Arc (for foundational work)</td>
+            <td>45%</td>
+          </tr>
+          <tr>
+            <td>Lambda Systems (for applied deployment)</td>
+            <td>55%</td>
+          </tr>
+        </table>
+        <p>Contributors are rewarded via sliding-scale meritocratic equity:</p>
+        <p class="highlight">Your contribution defines your reward — technical, computational, or audit-based.</p>
+        <p class="highlight">We track all contributions via transparent logging. Auditable, verifiable, fair.</p>
+      </div>
+    </section>
+
+    <section id="join-who" class="section">
+      <div class="section-content">
+        <h2>Who Can Join?</h2>
+        <p>There are three paths in:</p>
+        <div class="join-grid">
+          <div class="card" style="transition-delay: 0.1s;">
+            <h3>Domain Experts</h3>
+            <p>Deep expertise in a vertical (Bio, Astro, Quantum, Climate, etc.)</p>
+          </div>
+          <div class="card" style="transition-delay: 0.2s;">
+            <h3>Engineers & Builders</h3>
+            <p>ML systems, infrastructure, devs, compute contributors</p>
+          </div>
+          <div class="card" style="transition-delay: 0.3s;">
+            <h3>Auditors & Reviewers</h3>
+            <p>Validate math, code, and scientific merit</p>
+          </div>
+        </div>
+        <p>All members are expected to uphold our standards:</p>
+        <ul>
+          <li>Technical excellence</li>
+          <li>Open collaboration</li>
+          <li>Planetary benefit</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="why-matters" class="section">
+      <div class="section-content">
+        <h2>Why This Matters</h2>
+        <p>Seabed 2030. Quantum Simulators. Biophysical Models. Material Discovery.</p>
+        <p>We’re not chasing research grants. We’re solving civilization-grade problems — and open-sourcing the solutions.</p>
+        <p>We build it, validate it, deploy it. Commercially. Openly. Systematically.</p>
+        <p class="highlight">This is science rebuilt for the 21st century.</p>
+      </div>
+    </section>
+
+    <section id="join" class="join section">
+      <div class="section-content">
+        <h2>Join the Movement</h2>
+        <p>We don’t care where you're from. We care that you can build. Think. Verify. If your code runs, your math checks out, and your heart’s in it — we want you.</p>
+        <ul>
+          <li style="list-style: none;">Singaporean Biologist</li>
+          <li style="list-style: none;">Polish HPC Engineer</li>
+          <li style="list-style: none;">Berlin Materials Scientist</li>
+          <li style="list-style: none;">Indian Compiler Architect</li>
+        </ul>
+        <p class="highlight">This is Lambda0. Let’s build the system that builds the future.</p>
+        <div class="ctas">
+          <a href="#join" class="cta">Join the Collective</a>
+          <a href="#propose" class="cta">Propose a Problem</a>
+          <a href="#repos" class="cta">View Our Repos</a>
+          <a href="#get-involved" class="cta">Get Involved</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="journal" class="section">
+      <div class="section-content">
+        <h2>CSE-Repo-of-Advanced-Computation-ML-and-Systems-Engineering (Coming Soon)</h2>
+        <p>Peer-reviewed, community-led publishing. AI/ML, computational physics, open infra, optimization.</p>
+        <p class="highlight">Meritocratic. Transparent. Citable.</p>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <div class="logo">
+      <img src="lambda0-logo.png" alt="Lambda0.ai Logo">
+    </div>
+    <div>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Use</a>
+      <a href="#">Twitter</a>
+      <a href="#">GitHub</a>
+    </div>
+    <p>© 2025 Lambda0.ai</p>
+  </footer>
+
+  <script>
+    const canvas = document.getElementById('backgroundCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let mouse = { x: 0, y: 0 };
+    let scrollY = 0;
+    let time = 0;
+
+    const gridSize = 70;
+    const nodes = [];
+    const lines = [];
+    const maxDistance = 150;
+
+    for (let x = 0; x < canvas.width + gridSize; x += gridSize) {
+      for (let y = 0; y < canvas.height + gridSize; y += gridSize) {
+        const xOffset = (Math.random() - 0.5) * gridSize * 0.3;
+        const yOffset = (Math.random() - 0.5) * gridSize * 0.3;
+        nodes.push({
+          x: x + xOffset,
+          y: y + yOffset,
+          baseX: x + xOffset,
+          baseY: y + yOffset,
+          size: Math.random() * 2 + 1,
+          blink: Math.random() > 0.8,
+          pulseSpeed: Math.random() * 0.02 + 0.01
+        });
+      }
+    }
+
+    nodes.forEach((nodeA, i) => {
+      nodes.forEach((nodeB, j) => {
+        if (i !== j) {
+          const dx = nodeA.baseX - nodeB.baseX;
+          const dy = nodeA.baseY - nodeB.baseY;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < maxDistance) {
+            lines.push({
+              start: nodeA,
+              end: nodeB,
+              distance: distance
+            });
+          }
+        }
+      });
+    });
+
+    const equations = [
+      'F = ma',
+      'E = mc²',
+      '∇·B = 0',
+      '∂ψ/∂t = -iHψ',
+      'λx.t',
+      'P(A|B) = P(B|A)P(A)/P(B)',
+      'H(X) = -∑P(x)log P(x)',
+      '∫e^x dx = e^x + C'
+    ];
+
+    function createEquation() {
+      const eq = document.createElement('div');
+      eq.className = 'equation';
+      eq.textContent = equations[Math.floor(Math.random() * equations.length)];
+      eq.style.left = mouse.x + 'px';
+      eq.style.top = mouse.y + 'px';
+      document.body.appendChild(eq);
+
+      setTimeout(() => {
+        eq.style.opacity = '0.1';
+        setTimeout(() => {
+          eq.style.opacity = '0';
+          setTimeout(() => eq.remove(), 1000);
+        }, 2000);
+      }, 100);
+    }
+
+    document.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      if (Math.random() > 0.95) createEquation();
+    });
+
+    window.addEventListener('scroll', () => {
+      scrollY = window.scrollY;
+      const systemGrid = document.querySelector('.system-grid');
+      const joinGrid = document.querySelector('.join-grid');
+      if (systemGrid) {
+        const systemRect = systemGrid.getBoundingClientRect();
+        const systemTilt = Math.max(-15, Math.min(15, systemRect.top / 50));
+        systemGrid.style.transform = `perspective(1000px) rotateX(${systemTilt}deg)`;
+      }
+      if (joinGrid) {
+        const joinRect = joinGrid.getBoundingClientRect();
+        const joinTilt = Math.max(-15, Math.min(15, joinRect.top / 50));
+        joinGrid.style.transform = `perspective(1000px) rotateX(${joinTilt}deg)`;
+      }
+    });
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      nodes.forEach(node => {
+        const dx = mouse.x - node.x;
+        const dy = mouse.y - node.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const maxDist = 200;
+
+        if (dist < maxDist) {
+          const force = (maxDist - dist) / maxDist;
+          node.x = node.baseX + dx * force * 0.05;
+          node.y = node.baseY + dy * force * 0.05;
+        } else {
+          node.x += (node.baseX - node.x) * 0.05;
+          node.y += (node.baseY - node.y) * 0.05;
+        }
+      });
+
+      lines.forEach(line => {
+        const dx = line.start.x - line.end.x;
+        const dy = line.start.y - line.end.y;
+        const currentDist = Math.sqrt(dx * dx + dy * dy);
+
+        const opacity = Math.max(0, 1 - (currentDist / maxDistance));
+        const timeOpacity = (Math.sin(time * line.start.pulseSpeed) + 1) * 0.2;
+
+        ctx.beginPath();
+        ctx.moveTo(line.start.x, line.start.y);
+        ctx.lineTo(line.end.x, line.end.y);
+        ctx.strokeStyle = `rgba(0, 255, 255, ${opacity * 0.2 + timeOpacity * 0.05})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      });
+
+      nodes.forEach(node => {
+        const dx = mouse.x - node.x;
+        const dy = mouse.y - node.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const brightness = dist < 200 ? (200 - dist) / 200 : 0;
+
+        const pulse = (Math.sin(time * node.pulseSpeed) + 1) * 0.5;
+
+        if (node.blink && Math.sin(time * 2 + node.x + node.y) > 0.8) {
+          ctx.fillStyle = `rgba(255, 255, 255, ${0.7 + brightness * 0.3})`;
+        } else {
+          ctx.fillStyle = `rgba(0, 255, 255, ${(0.2 + pulse * 0.3) + brightness * 0.5})`;
+        }
+
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.size * (1 + pulse * 0.5), 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 2;
+
+      for (let x = 0; x < canvas.width; x += 5) {
+        const mouseInfluence = Math.sin(mouse.x * 0.002) * 30;
+        const y = canvas.height / 2 +
+                 Math.sin(x * 0.005 + time) * 50 +
+                 scrollY * 0.05 +
+                 mouseInfluence;
+
+        if (x === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(45, 156, 219, 0.3)';
+
+      for (let x = 0; x < canvas.width; x += 5) {
+        const mouseInfluence = Math.cos(mouse.y * 0.002) * 30;
+        const y = canvas.height / 2 +
+                 Math.sin(x * 0.005 + time + 1) * 50 +
+                 scrollY * 0.05 +
+                 mouseInfluence;
+
+        if (x === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.stroke();
+
+      time += 0.01;
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      nodes.length = 0;
+      lines.length = 0;
+
+      for (let x = 0; x < canvas.width + gridSize; x += gridSize) {
+        for (let y = 0; y < canvas.height + gridSize; y += gridSize) {
+          const xOffset = (Math.random() - 0.5) * gridSize * 0.3;
+          const yOffset = (Math.random() - 0.5) * gridSize * 0.3;
+          nodes.push({
+            x: x + xOffset,
+            y: y + yOffset,
+            baseX: x + xOffset,
+            baseY: y + yOffset,
+            size: Math.random() * 2 + 1,
+            blink: Math.random() > 0.8,
+            pulseSpeed: Math.random() * 0.02 + 0.01
+          });
+        }
+      }
+
+      nodes.forEach((nodeA, i) => {
+        nodes.forEach((nodeB, j) => {
+          if (i !== j) {
+            const dx = nodeA.baseX - nodeB.baseX;
+            const dy = nodeA.baseY - nodeB.baseY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < maxDistance) {
+              lines.push({
+                start: nodeA,
+                end: nodeB,
+                distance: distance
+              });
+            }
+          }
+        });
+      });
+    });
+
+    const sections = document.querySelectorAll('.section');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          const cards = entry.target.querySelectorAll('.card');
+          cards.forEach(card => card.classList.add('visible'));
+        }
+      });
+    }, { threshold: 0.1 });
+    sections.forEach(section => {
+      observer.observe(section);
+    });
+  </script>
+</body>
+</html>

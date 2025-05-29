@@ -6,7 +6,7 @@
 [![API Status](https://img.shields.io/badge/API-Live-green.svg)](https://scimlhub.com/status)
 [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://docs.scimlhub.com)
 
-**Lambda_Zero** is a unified platform for scientific machine learning, providing state-of-the-art Nexa models for predictions in biology (protein structure), astrophysics (stellar properties), and materials science (material properties). Access these models via a simple REST API, with results returned in JSON format including predictions and confidence scores (0-100%).
+**Lambda_Zero** is a unified platform for scientific machine learning, providing the newest Nexa models for predictions in biology (protein structure), astrophysics (stellar properties), and material science (material properties). Access these models via a simple REST API, with results returned in JSON format including predictions and confidence scores (0-100%).
 
 ## Quick Start
 
@@ -72,21 +72,14 @@ print(f"Confidence: {result['confidence']}%")
 - **Purpose**: Predicts protein secondary structures (H: Helix, E: Sheet, C: Coil)
 - **Accuracy**: 70.82% overall (Q3 score)
 - **Latency**: ~78ms
-- **Details**: See `helixsynth-pro.ipynb` and `Technical_Whitepaper/analysis_results_20250219_202508.txt`
-
-### Astrophysics: Stellar Classification
-- **Model**: Ensemble (Random Forest, CatBoost, Neural Network)
-- **Purpose**: Predicts stellar properties (mass, class: QSO, GALAXY, STAR)
-- **Accuracy**: 97.49% on validation set
-- **Latency**: ~45ms
-- **Details**: See `Technical_Whitepaper/Astrophysics results.txt`
+- **Details**: See https://github.com/DarkStarStrix/CSE-Repo-of-Advanced-Computation-ML-and-Systems-Engineering/blob/main/Papers/Computer_Science/Machine_Learning/Protein_Structure_Prediction.pdf
 
 ### Materials Science: Materials GNN
 - **Model**: Graph Neural Network (GNN)
 - **Purpose**: Predicts material properties (band gap, formation energy)
 - **Accuracy**: 98.5% on crystal structures
 - **Latency**: ~62ms
-- **Details**: See `Material Science/generated_structures.csv`
+- **Details**: See https://github.com/DarkStarStrix/CSE-Repo-of-Advanced-Computation-ML-and-Systems-Engineering/blob/main/Papers/Computer_Science/Machine_Learning/Material_Scince_battery_ion_prediction.pdf
 
 ## API Usage
 
@@ -99,32 +92,14 @@ The API endpoints return predictions and confidence scores in JSON format: `{"pr
 - **Input**:
   ```json
   {
-    "sequence": "MAKQVKL"  // Amino acid sequence (up to 1000 residues)
+    "sequence": "MAKQVKL" 
   }
   ```
 - **Output**:
   ```json
   {
-    "prediction": "H",  // H (Helix), E (Sheet), C (Coil)
-    "confidence": 80.56  // Confidence in percentage (0-100)
-  }
-  ```
-
-#### 2. `/v1/astro/predict` - Stellar Property Prediction
-- **Method**: POST
-- **Input**:
-  ```json
-  {
-    "temp": 5778,        // Temperature in Kelvin
-    "luminosity": 1.0,   // Luminosity in solar units
-    "metallicity": 0.0   // Metallicity [Fe/H]
-  }
-  ```
-- **Output**:
-  ```json
-  {
-    "prediction": 1.0,   // Mass in solar masses
-    "confidence": 97.49  // Confidence in percentage (0-100)
+    "prediction": "H",  
+    "confidence": 80.56  
   }
   ```
 
@@ -133,14 +108,14 @@ The API endpoints return predictions and confidence scores in JSON format: `{"pr
 - **Input**:
   ```json
   {
-    "structure": "POSCAR data string"  // Crystal structure in POSCAR format
+    "structure": "POSCAR data string"  
   }
   ```
 - **Output**:
   ```json
   {
-    "prediction": 2.5,   // Band gap in eV
-    "confidence": 98.5   // Confidence in percentage (0-100)
+    "prediction": 2.5,  
+    "confidence": 98.5   
   }
   ```
 
@@ -160,8 +135,9 @@ X-API-Key: your_api_key
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/DarkStarStrix/scimlhub.git
-   cd scimlhub
+   git clone https://github.com/DarkStarStrix/Lambda_Zero.git
+   ```
+   cd Lambda_Zero
    ```
 
 2. **Install Dependencies**:
@@ -228,10 +204,8 @@ X-API-Key: your_api_key
 | Enterprise   | Unlimited      | Custom    |
 
 ## Resources
-- [API Docs](https://docs.scimlhub.com)
 - [How to Use](how_to_use.md)
 - [Changelog](CHANGELOG.md)
-- [Examples](https://github.com/scimlhub/examples)
 
 ## Enterprise Support
 For custom models, on-premise deployment, or integration help, email: [allanw.mk@gmail.com](mailto:allanw.mk@gmail.com).

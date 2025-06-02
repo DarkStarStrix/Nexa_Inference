@@ -1,12 +1,9 @@
-# Lambda_Zero
-
-<img src="https://github.com/user-attachments/assets/42c95527-2417-4a4d-ba21-2355901f9f8b" alt="Lambda_Zero Logo" width="200" height="200">
-
+# Lambda_Inference 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![API Status](https://img.shields.io/badge/API-Live-green.svg)](https://scimlhub.com/status)
 [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://docs.scimlhub.com)
 
-**Lambda_Zero** is a unified platform for scientific machine learning, providing the newest Nexa models for predictions in biology (protein structure), astrophysics (stellar properties), and material science (material properties). Access these models via a simple REST API, with results returned in JSON format including predictions and confidence scores (0-100%).
+**Lambda_Inference** is a unified platform for scientific machine learning, providing the newest Nexa models for predictions in biology (protein structure), astrophysics (stellar properties), and material science (material properties). Access these models via a simple REST API, with results returned in JSON format including predictions and confidence scores (0-100%).
 
 ## Quick Start
 
@@ -21,7 +18,7 @@ Predict the secondary structure of a protein sequence:
 import requests
 
 response = requests.post(
-    "https://api.scimlhub.com/v1/bio/predict",
+    "https://api.Lambda_inference.com/v1/bio/predict",
     headers={"X-API-Key": "your_api_key"},
     json={"sequence": "MAKQVKL"}
 )
@@ -35,7 +32,7 @@ print(result)
 Estimate a star's mass:
 ```python
 response = requests.post(
-    "https://api.scimlhub.com/v1/astro/predict",
+    "https://api.Lambda_inference.com/v1/astro/predict",
     headers={"X-API-Key": "your_api_key"},
     json={
         "temp": 5778,  # Kelvin
@@ -54,7 +51,7 @@ print(f"Confidence: {result['confidence']}%")
 Predict a material's band gap:
 ```python
 response = requests.post(
-    "https://api.scimlhub.com/v1/materials/predict",
+    "https://api.Lambda_inference.com/v1/materials/predict",
     headers={"X-API-Key": "your_api_key"},
     json={"structure": "POSCAR data string"}
 )
@@ -193,15 +190,6 @@ X-API-Key: your_api_key
 - **Biology**: Protein design, drug discovery
 - **Astrophysics**: Stellar classification, exoplanet research
 - **Materials Science**: Material discovery, energy applications
-
-## Pricing
-| Plan         | Requests/Month | Price     |
-|--------------|----------------|-----------|
-| Free         | 300            | $0        |
-| Premium-1K   | 1,000          | $50/month |
-| Premium-5K   | 5,000          | $35/month |
-| Premium-10K  | 10,000         | $25/month |
-| Enterprise   | Unlimited      | Custom    |
 
 ## Resources
 - [How to Use](how_to_use.md)

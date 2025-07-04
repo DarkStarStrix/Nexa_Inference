@@ -1,9 +1,9 @@
-# Lambda_Inference 
+# Nexa_Inference 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![API Status](https://img.shields.io/badge/API-Live-green.svg)](https://scimlhub.com/status)
 [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://docs.scimlhub.com)
 
-**Lambda_Inference** is a unified platform for scientific machine learning, providing the newest Nexa models for predictions in biology (protein structure), astrophysics (stellar properties), and material science (material properties). Access these models via a simple REST API, with results returned in JSON format including predictions and confidence scores (0-100%).
+**Nexa_Inference** is a unified platform for scientific machine learning, providing the newest Nexa models for predictions in biology (protein structure), astrophysics (stellar properties), and material science (material properties). Access these models via a simple REST API, with results returned in JSON format including predictions and confidence scores (0-100%).
 
 ## Quick Start
 
@@ -18,7 +18,7 @@ Predict the secondary structure of a protein sequence:
 import requests
 
 response = requests.post(
-    "https://api.Lambda_inference.com/v1/bio/predict",
+    "https://api.Nexa_inference.com/v1/bio/predict",
     headers={"X-API-Key": "your_api_key"},
     json={"sequence": "MAKQVKL"}
 )
@@ -32,7 +32,7 @@ print(result)
 Estimate a star's mass:
 ```python
 response = requests.post(
-    "https://api.Lambda_inference.com/v1/astro/predict",
+    "https://api.Nexa_inference.com/v1/astro/predict",
     headers={"X-API-Key": "your_api_key"},
     json={
         "temp": 5778,  # Kelvin
@@ -51,7 +51,7 @@ print(f"Confidence: {result['confidence']}%")
 Predict a material's band gap:
 ```python
 response = requests.post(
-    "https://api.Lambda_inference.com/v1/materials/predict",
+    "https://api.Nexa_inference.com/v1/materials/predict",
     headers={"X-API-Key": "your_api_key"},
     json={"structure": "POSCAR data string"}
 )
@@ -132,7 +132,7 @@ X-API-Key: your_api_key
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/DarkStarStrix/Lambda_Zero.git
+   git clone https://github.com/DarkStarStrix/Nexa_Inference.git
    ```
    cd Lambda_Zero
    ```

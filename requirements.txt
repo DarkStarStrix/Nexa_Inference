@@ -2,20 +2,20 @@ slowapi~=0.1.9
 prometheus_client
 
 
-fastapi~=0.115.8
-uvicorn~=0.34.0
-prometheus_client~=0.21.1
-pydantic~=2.10.6
-torch~=2.7.0
-pytest~=8.3.5
-numpy~=1.26.4
-pandas~=2.2.3
+fastapi~=0.116.1
+uvicorn~=0.35.0
+prometheus_client~=0.22.1
+pydantic~=2.11.7
+torch~=2.8.0
+pytest~=8.4.1
+numpy~=2.2.6
+pandas~=2.3.1
 matplotlib~=3.10.0
 seaborn~=0.13.2
 tqdm~=4.67.1
-scikit-learn~=1.6.1
+scikit-learn~=1.7.1
 scipy~=1.15.2
-streamlit~=1.45.1
-plotly~=6.0.0
-bio~=1.7.1
+streamlit~=1.48.0
+plotly~=6.2.0
+bio~=1.8.0
 biopython~=1.85

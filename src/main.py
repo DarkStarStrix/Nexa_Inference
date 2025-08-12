@@ -1,42 +1,45 @@
+import asyncio  # added for asynchronous execution
 import logging
-import time
 import random
 import string
-import io
-import csv
-from datetime import datetime
+import time
 from collections import deque
+from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, Depends, Request
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 
+from src.Config import Config
 from src.auth import verify_api_key
 from src.engines import BiologyInferenceEngine, MaterialsInferenceEngine
-from src.models import BiologyRequest, MaterialsRequest
+from src.models import BiologyRequest, MaterialsRequest, BatchBiologyRequest, BatchMaterialsRequest
 
-app = FastAPI(title="Lambda0 API", version="1.0.0")
-logger = logging.getLogger("lambda0")
+app = FastAPI(title="Nexa API", version="2.0.0")
+logger = logging.getLogger("Nexa")
 logging.basicConfig(level=logging.INFO)
 
-MODEL_PATHS = {
-    "bio": {
-        "1": "C:/Users/kunya/PycharmProjects/HelixSynth/models/NexaBio_1.pt",
-        "2": "C:/Users/kunya/PycharmProjects/HelixSynth/models/NexaBio_2.pt"
-    },
-    "materials": {
-        "1": "C:/Users/kunya/PycharmProjects/HelixSynth/models/NexaMat_1.pt",
-        "2": "C:/Users/kunya/PycharmProjects/HelixSynth/models/NexaMat_2.pt"
-    }
-}
+# Load configuration
+try:
+    config = Config(config_file='config.json')
+    MODEL_PATHS = config.get("model_paths")
+except FileNotFoundError:
+    logger.error("config.json not found. Please create it. Exiting.")
+    exit()
+
 
 engines = {}
 for model_type in ["bio_1", "bio_2", "mat_1", "mat_2"]:
     try:
         domain, version = model_type.split("_")
+        path_key = "bio" if domain == "bio" else "materials"
+        model_path = MODEL_PATHS.get(path_key, {}).get(version)
+        if not model_path:
+            raise FileNotFoundError(f"Path for {model_type} not found in config.json")
+
         if domain == "bio":
-            engines[model_type] = BiologyInferenceEngine(MODEL_PATHS["bio"][version])
+            engines[model_type] = BiologyInferenceEngine(model_path)
         else:
-            engines[model_type] = MaterialsInferenceEngine(MODEL_PATHS["materials"][version])
+            engines[model_type] = MaterialsInferenceEngine(model_path)
     except Exception as e:
         logger.error(f"Failed to load {model_type} model: {str(e)}")
         engines[model_type] = None
@@ -104,7 +107,7 @@ async def dashboard():
     return """
     <html>
         <head>
-            <title>Lambda0 Model Backend Dashboard</title>
+            <title>Nexa Model Backend Dashboard</title>
             <style>
                 body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #222; }
                 .container { max-width: 950px; margin: 0 auto; padding: 30px; }
@@ -123,11 +126,12 @@ async def dashboard():
                 .dataset-form-row label { min-width: 140px; }
                 .dataset-form-row input[type=number] { width: 80px; padding: 6px; border-radius: 4px; border: 1px solid #ccc; }
                 .download-icon { vertical-align: middle; margin-left: 6px; }
+                textarea { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; min-height: 60px; margin-top: 10px; }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>Lambda0 Model Backend Dashboard </h1>
+                <h1>Nexa Model Backend Dashboard </h1>
                 <div class="section">
                     <h2>System Metrics</h2>
                     <table class="metrics-table">
@@ -173,6 +177,15 @@ async def dashboard():
                         <h2>NexaMat_1 (Materials Prediction)</h2>
                         <button onclick="testMat1()">Test Materials Prediction</button>
                         <div id="mat1Result" class="json-output"></div>
+                    </div>
+                </div>
+                <div class="section">
+                    <h2>End-to-End SciML Pipeline</h2>
+                    <div class="test-card">
+                        <h3>Biology Pipeline (Drug Discovery)</h3>
+                        <textarea id="bio-pipeline-query" placeholder="Enter a query, e.g., 'Generate hypotheses for protein folding under high temperature'"></textarea>
+                        <button onclick="runBioPipeline()">Run Pipeline</button>
+                        <div id="bioPipelineResult" class="json-output"></div>
                     </div>
                 </div>
                 <div class="dataset-section">
@@ -256,7 +269,7 @@ async def dashboard():
                     const res = await fetch('/api/predict/bio', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-API-Key': 'development_key' },
-                        body: JSON.stringify({ sequence: seq, model_version: '1', confidence_threshold: 0.8 })
+                        body: JSON.stringify({ sequence: seq, model_version: '1', confidence_threshold: 0.8, explain: true })
                     });
                     const data = await res.json();
                     document.getElementById('bio1Result').innerHTML = '<pre>' + syntaxHighlight(data) + '</pre>';
@@ -267,7 +280,7 @@ async def dashboard():
                     const res = await fetch('/api/predict/bio', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-API-Key': 'development_key' },
-                        body: JSON.stringify({ sequence: seq, model_version: '2', confidence_threshold: 0.8 })
+                        body: JSON.stringify({ sequence: seq, model_version: '2', confidence_threshold: 0.8, mode: 'speculative' })
                     });
                     const data = await res.json();
                     document.getElementById('bio2Result').innerHTML = '<pre>' + syntaxHighlight(data) + '</pre>';
@@ -278,11 +291,26 @@ async def dashboard():
                     const res = await fetch('/api/predict/materials', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-API-Key': 'development_key' },
-                        body: JSON.stringify({ structure: struct, model_version: '1', energy_threshold: 0.5 })
+                        body: JSON.stringify({ structure: struct, model_version: '1', energy_threshold: 0.5, explain: true })
                     });
                     const data = await res.json();
                     document.getElementById('mat1Result').innerHTML = '<pre>' + syntaxHighlight(data) + '</pre>';
                     updateMetrics();
+                }
+
+                async function runBioPipeline() {
+                    const query = document.getElementById('bio-pipeline-query').value;
+                    if (!query) {
+                        alert('Please enter a query for the pipeline.');
+                        return;
+                    }
+                    const res = await fetch('/api/pipeline/bio', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-API-Key': 'development_key' },
+                        body: JSON.stringify({ query: query })
+                    });
+                    const data = await res.json();
+                    document.getElementById('bioPipelineResult').innerHTML = '<pre>' + syntaxHighlight(data) + '</pre>';
                 }
 
                 async function generateDataset(type) {
@@ -335,19 +363,21 @@ async def predict_bio(request: BiologyRequest, _=Depends(verify_api_key)):
         engine = engines.get(f"bio_{request.model_version}")
         if engine is None:
             raise HTTPException(status_code=500, detail="Model not loaded")
-        raw_result = engine.predict({
-            "sequence": request.sequence,
-            "confidence_threshold": request.confidence_threshold
-        })
+        raw_result = await asyncio.to_thread(
+            engine.predict,
+            {
+                "sequence": request.sequence,
+                "confidence_threshold": request.confidence_threshold,
+                "mode": request.mode,
+                "explain": request.explain
+            }
+        )
         if "tertiary_coordinates" in raw_result:
             raw_result["tertiary_coordinates"] = [
                 [float(f"{x[0]:.2f}"), float(f"{x[1]:.2f}"), float(f"{x[2]:.2f}")]
                 for x in raw_result["tertiary_coordinates"]
             ]
-        result = {
-            "model": f"NexaBio_{request.model_version}",
-            **raw_result
-        }
+        result = {"model": f"NexaBio_{request.model_version}", **raw_result}
         return JSONResponse(content=result)
     except Exception as e:
         logger.error(f"Biology prediction failed: {str(e)}")
@@ -359,89 +389,129 @@ async def predict_materials(request: MaterialsRequest, _=Depends(verify_api_key)
         engine = engines.get(f"mat_{request.model_version}")
         if engine is None:
             raise HTTPException(status_code=500, detail="Model not loaded")
-        raw_result = engine.predict({
-            "structure": request.structure,
-            "energy_threshold": request.energy_threshold
-        })
-        result = {
-            "model": f"NexaMat_{request.model_version}",
-            **raw_result
-        }
+        raw_result = await asyncio.to_thread(
+            engine.predict,
+            {
+                "structure": request.structure,
+                "energy_threshold": request.energy_threshold,
+                "mode": request.mode,
+                "explain": request.explain
+            }
+        )
+        result = {"model": f"NexaMat_{request.model_version}", **raw_result}
         return JSONResponse(content=result)
     except Exception as e:
         logger.error(f"Materials prediction failed: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/dataset/bio")
-async def generate_bio_dataset(size: int = 100, _=Depends(verify_api_key)):
-    dataset = []
-    for _ in range(size):
-        entry = {
-            "sequence": random_sequence(16),
-            "structure": random_structure(8),
-            "confidence": round(random.uniform(0.7, 1.0), 3),
-            "length": random.randint(10, 100)
-        }
-        dataset.append(entry)
-    return JSONResponse(content=dataset)
+@app.post("/api/predict/bio/batch")
+async def predict_bio_batch(request: BatchBiologyRequest, _=Depends(verify_api_key)):
+    async def process_req(item):
+        try:
+            engine = engines.get(f"bio_{item.model_version}")
+            if engine is None:
+                return {"error": "Model not loaded"}
+            raw_result = await asyncio.to_thread(
+                engine.predict,
+                {
+                    "sequence": item.sequence,
+                    "confidence_threshold": item.confidence_threshold,
+                    "mode": item.mode,
+                    "explain": item.explain
+                }
+            )
+            return {"model": f"NexaBio_{item.model_version}", **raw_result}
+        except Exception as e:
+            return {"error": str(e)}
+    tasks = [process_req(item) for item in request.requests]
+    results = await asyncio.gather(*tasks)
+    return JSONResponse(content=results)
 
-@app.post("/api/dataset/materials")
-async def generate_materials_dataset(size: int = 100, _=Depends(verify_api_key)):
-    dataset = []
-    for _ in range(size):
-        entry = {
-            "formation_energy_per_atom": round(random.uniform(-5, 5), 3),
-            "energy_per_atom": round(random.uniform(-10, 10), 3),
-            "density": round(random.uniform(0.5, 20.0), 3),
-            "volume": round(random.uniform(10, 1000), 2),
-            "n_elements": random.randint(1, 10),
-            "li_fraction": round(random.uniform(0, 1), 3),
-            "predicted_band_gap": round(random.uniform(0, 5), 3),
-            "confidence_score": round(random.uniform(0.7, 1.0), 3)
-        }
-        dataset.append(entry)
-    return JSONResponse(content=dataset)
+@app.post("/api/predict/materials/batch")
+async def predict_materials_batch(request: BatchMaterialsRequest, _=Depends(verify_api_key)):
+    async def process_req(item):
+        try:
+            engine = engines.get(f"mat_{item.model_version}")
+            if engine is None:
+                return {"error": "Model not loaded"}
+            raw_result = await asyncio.to_thread(
+                engine.predict,
+                {
+                    "structure": item.structure,
+                    "energy_threshold": item.energy_threshold,
+                    "mode": item.mode,
+                    "explain": item.explain
+                }
+            )
+            return {"model": f"NexaMat_{item.model_version}", **raw_result}
+        except Exception as exc:
+            tasks = [process_req(item) for item in request.requests]
+            results = await asyncio.gather(*tasks)
+            return JSONResponse(content=results)
+    @app.post("/api/pipeline/bio")
+    async def bio_pipeline(request: dict, _=Depends(verify_api_key)):
+        # Simplified pipeline implementation
+        try:
+            query = request.get("query", "")
+            # Step 1: Generate candidate sequences
+            sequences = [random_sequence() for _ in range(3)]
 
-@app.post("/api/dataset/bio/csv")
-async def generate_bio_dataset_csv(size: int = 100, _=Depends(verify_api_key)):
-    dataset = []
-    for _ in range(size):
-        entry = {
-            "sequence": random_sequence(16),
-            "structure": random_structure(8),
-            "confidence": round(random.uniform(0.7, 1.0), 3),
-            "length": random.randint(10, 100)
-        }
-        dataset.append(entry)
-    output = io.StringIO()
-    writer = csv.DictWriter(output, fieldnames=dataset[0].keys())
-    writer.writeheader()
-    writer.writerows(dataset)
-    output.seek(0)
-    return StreamingResponse(output, media_type="text/csv", headers={"Content-Disposition": "attachment; filename=bio_dataset.csv"})
+            # Step 2: Predict structures for each sequence
+            predictions = []
+            for seq in sequences:
+                engine = engines.get("bio_1")
+                if engine:
+                    raw_result = await asyncio.to_thread(
+                        engine.predict,
+                        {"sequence": seq, "confidence_threshold": 0.7, "explain": True}
+                    )
+                    predictions.append({"sequence": seq, "prediction": raw_result})
 
-@app.post("/api/dataset/materials/csv")
-async def generate_materials_dataset_csv(size: int = 100, _=Depends(verify_api_key)):
-    dataset = []
-    for _ in range(size):
-        entry = {
-            "formation_energy_per_atom": round(random.uniform(-5, 5), 3),
-            "energy_per_atom": round(random.uniform(-10, 10), 3),
-            "density": round(random.uniform(0.5, 20.0), 3),
-            "volume": round(random.uniform(10, 1000), 2),
-            "n_elements": random.randint(1, 10),
-            "li_fraction": round(random.uniform(0, 1), 3),
-            "predicted_band_gap": round(random.uniform(0, 5), 3),
-            "confidence_score": round(random.uniform(0.7, 1.0), 3)
-        }
-        dataset.append(entry)
-    output = io.StringIO()
-    writer = csv.DictWriter(output, fieldnames=dataset[0].keys())
-    writer.writeheader()
-    writer.writerows(dataset)
-    output.seek(0)
-    return StreamingResponse(output, media_type="text/csv", headers={"Content-Disposition": "attachment; filename=materials_dataset.csv"})
+            return {
+                "query": query,
+                "timestamp": datetime.now().isoformat(),
+                "candidates": predictions
+            }
+        except Exception as e:
+            logger.error(f"Bio pipeline failed: {str(e)}")
+            raise HTTPException(status_code=500, detail=str(e))
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    @app.post("/api/dataset/bio")
+    async def generate_bio_dataset(size: int = 10, _=Depends(verify_api_key)):
+        data = []
+        for _ in range(size):
+            seq = random_sequence()
+            data.append({"sequence": seq, "id": f"BIO_{time.time()}_{random.randint(1000, 9999)}"})
+        return data
+
+    @app.post("/api/dataset/materials")
+    async def generate_materials_dataset(size: int = 10, _=Depends(verify_api_key)):
+        data = []
+        for _ in range(size):
+            struct = random_structure()
+            data.append({"structure": struct, "id": f"MAT_{time.time()}_{random.randint(1000, 9999)}"})
+        return data
+
+    @app.post("/api/dataset/bio/csv")
+    async def generate_bio_csv(size: int = 10, _=Depends(verify_api_key)):
+        data = ["id,sequence,predicted_structure"]
+        for _ in range(size):
+            seq = random_sequence()
+            data.append(f"BIO_{time.time()}_{random.randint(1000, 9999)},{seq},{''.join(random.choices('HEC', k=len(seq)))}")
+        return "\n".join(data)
+
+    @app.post("/api/dataset/materials/csv")
+    async def generate_materials_csv(size: int = 10, _=Depends(verify_api_key)):
+        data = ["id,structure,energy,stability"]
+        for _ in range(size):
+            struct = random_structure()
+            energy = round(random.uniform(-10.0, 0.0), 2)
+            stability = random.choice(["high", "medium", "low"])
+            data.append(f"MAT_{time.time()}_{random.randint(1000, 9999)},{struct},{energy},{stability}")
+        return "\n".join(data)
+
+    if __name__ == "__main__":
+        import uvicorn
+        logger.info("Starting Nexa API server...")
+        logger.info(f"Loaded models: {[k for k, v in engines.items() if v is not None]}")
+        uvicorn.run(app, host="0.0.0.0", port=8000)

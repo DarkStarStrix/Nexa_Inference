@@ -3,6 +3,7 @@ from .inference import load_torch_model, predict
 from .models import BiologyRequest, MaterialsRequest, DatasetRequest
 from .Config import Config
 from .Utils import setup_logging, validate_request
+from .Pipelines import run_pipeline
 __all__ = [
     "load_torch_model",
     "predict",
@@ -12,4 +13,5 @@ __all__ = [
     "Config",
     "setup_logging",
     "validate_request"
+    "Pipelines",
 ]

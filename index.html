@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexa_Inference | Unified Scientific & LLM Inference</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --primary-color: #0d6efd;
+            --primary-hover: #3d8bfd;
+            --text-color: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --border-color: #333;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background: var(--bg-color);
+            padding: 4rem 0;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        header h1 {
+            font-size: 3.5rem;
+            color: var(--text-color);
+            margin: 0;
+            font-weight: 700;
+        }
+        header h1 span {
+            color: var(--primary-color);
+        }
+        header p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 1rem auto 0;
+        }
+        section {
+            padding: 60px 20px;
+        }
+        h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 50px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .feature-card {
+            background: var(--surface-color);
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            text-align: left;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.1);
+        }
+        .feature-card h3 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-top: 0;
+        }
+        pre {
+            background: #000;
+            color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: "SF Mono", "Fira Code", "Courier New", Courier, monospace;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+        }
+        code {
+            font-family: inherit;
+        }
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 40px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+        }
+        .button {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: var(--primary-hover);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <h1>Nexa<span>_</span>Inference</h1>
+            <p>A high-performance, unified platform for Scientific Machine Learning and LLM inference, designed for accuracy, speed, and scalability.</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section id="features">
+            <h2>One Platform, Infinite Discoveries</h2>
+            <p class="section-subtitle">Nexa_Inference combines multiple scientific domains and cutting-edge language models into a single, easy-to-use API.</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Biology & Drug Discovery</h3>
+                    <p>Predict protein secondary and tertiary structures from amino acid sequences to accelerate drug discovery and protein design.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Materials Science</h3>
+                    <p>Use Graph Neural Networks to predict key properties of novel materials, such as band gap and formation energy, for battery and semiconductor research.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>LLM Inference</h3>
+                    <p>Leverage a powerful language model for text generation, summarization, and analysis, complete with detailed performance metrics for your application.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="technology">
+            <h2>Advanced Model Technology</h2>
+            <p class="section-subtitle">Our models are optimized for efficiency and security using the latest techniques and tools from the <a href="https://github.com/DarkStarStrix/NexaToolKit" target="_blank" style="color: var(--primary-color);">NexaToolKit</a> project.</p>
+             <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Model Quantization</h3>
+                    <p>All models are quantized to reduce their memory footprint and accelerate inference speed, without significant loss in accuracy. This enables deployment on a wider range of hardware.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>SafeTensors</h3>
+                    <p>We use the <code>safetensors</code> format for all models. This provides a secure, fast, and memory-efficient way to store and load tensors, protecting against malicious code and improving performance.</p>
+                </div>
+                 <div class="feature-card">
+                    <h3>On-Demand Benchmarking</h3>
+                    <p>Use the <code>/api/benchmark</code> endpoint to test model throughput and latency on your own hardware infrastructure, ensuring predictable performance in your environment.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="quickstart">
+            <h2>API Quickstart</h2>
+            <p class="section-subtitle">Get up and running in minutes. Send a POST request to our LLM endpoint and receive a response with performance data.</p>
+            <pre><code>
+import requests
+
+# Call the LLM endpoint
+response = requests.post(
+    "https://api.nexa_inference.com/v1/llm/predict",
+    headers={"X-API-Key": "your_api_key"},
+    json={
+        "prompt": "Explain the significance of protein folding.",
+        "max_tokens": 100
+    }
+)
+
+# Print the results
+print(response.json())
+
+# {
+#   "response": "Protein folding is a critical biological process...",
+#   "tokens_generated": 100,
+#   "metrics": {
+#     "total_latency_ms": 512.43,
+#     "time_to_first_token_ms": 85.12,
+#     "tokens_per_second": 195.15
+#   }
+# }
+            </code></pre>
+            <div style="text-align: center;">
+                 <a href="doc.md" class="button">View Full Documentation</a>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Nexa_Inference. All rights reserved.</p>
+        <p>For support or enterprise inquiries, contact <a href="mailto:allanw.mk@gmail.com" style="color: var(--primary-color);">allanw.mk@gmail.com</a>.</p>
+    </footer>
+
+</body>
+</html>

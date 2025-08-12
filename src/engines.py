@@ -1,12 +1,13 @@
-import torch
-from abc import ABC, abstractmethod
 import logging
-from typing import Dict, Any
 import os
-import time
-from src.inference import load_torch_model
-from datetime import datetime
 import random
+import time
+from abc import ABC, abstractmethod
+from datetime import datetime
+from typing import Dict, Any
+
+import psutil
+import torch
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +16,23 @@ class BaseInferenceEngine(ABC):
     def __init__(self, model_path: str):
         self.model_path = model_path
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self._log_hardware_specs()
         self.model = self._load_model()
         logger.info(f"Initialized {self.__class__.__name__} on {self.device}")
+
+    def _log_hardware_specs(self):
+        """Logs CPU, RAM, and GPU specifications."""
+        logger.info("--- Hardware Specifications ---")
+        logger.info(f"CPU Cores (Physical/Logical): {psutil.cpu_count(logical=False)}/{psutil.cpu_count(logical=True)}")
+        ram_gb = psutil.virtual_memory().total / (1024**3)
+        logger.info(f"Total RAM: {ram_gb:.2f} GB")
+        if self.device.type == 'cuda':
+            gpu_name = torch.cuda.get_device_name(0)
+            gpu_memory_gb = torch.cuda.get_device_properties(0).total_memory / (1024**3)
+            logger.info(f"GPU: {gpu_name}, Memory: {gpu_memory_gb:.2f} GB")
+        else:
+            logger.info("GPU: Not available (running on CPU)")
+        logger.info("-----------------------------")
 
     def _load_model(self) -> torch.nn.Module:
         """Load model with proper error handling and device mapping"""
@@ -48,6 +64,22 @@ class BaseInferenceEngine(ABC):
     def _validate_input(self, input_data: Dict[str, Any]) -> bool:
         """Validate input data"""
         return True
+
+    def _get_explanation(self, input_data: Dict[str, Any], result: Dict[str, Any]) -> str:
+        """Generates a mock XAI explanation."""
+        return "This prediction is based on the key features in the input data, processed by the model's learned patterns. Confidence is high due to strong feature alignment."
+
+    def _apply_speculative_decoding(self, result: Dict[str, Any]) -> Dict[str, Any]:
+        """Mocks the effect of speculative decoding by slightly altering results and adding a note."""
+        result["note"] = "Speculative decoding applied, potentially reducing latency."
+        # Example: slightly boost confidence as a mock effect
+        if "confidence" in result:
+            result["confidence"] = min(100.0, result.get("confidence", 0) * 1.05)
+        if "predicted_properties" in result and "confidence_score" in result["predicted_properties"]:
+             prediction = result.get("predicted_properties", {})
+             prediction["confidence_score"] = min(100.0, prediction.get("confidence_score", 0) * 1.05)
+             result["predicted_properties"] = prediction
+        return result
 
 class BiologyInferenceEngine(BaseInferenceEngine):
     """
@@ -86,15 +118,20 @@ class BiologyInferenceEngine(BaseInferenceEngine):
                 raise ValueError("Invalid input data")
             sequence = input_data.get("sequence", "")
             confidence_threshold = input_data.get("confidence_threshold", 0.8)
+            explain = input_data.get("explain", False)
+            mode = input_data.get("mode")
+
             model_name = os.path.basename(self.model_path)
             timestamp = datetime.now().isoformat()
+
+            result = {}
             if "1" in model_name:
                 # NexaBio_1: Secondary structure
                 structure = self.get_secondary_structure(sequence)
                 confidence = 0.92
                 if confidence < confidence_threshold:
                     structure = "U" * len(sequence)
-                return {
+                result = {
                     "sequence": sequence,
                     "secondary_structure": structure,
                     "confidence": round(confidence * 100, 2),
@@ -106,12 +143,20 @@ class BiologyInferenceEngine(BaseInferenceEngine):
                 confidence = 0.89
                 if confidence < confidence_threshold:
                     coords = []
-                return {
+                result = {
                     "sequence": sequence,
                     "tertiary_coordinates": coords,
                     "confidence": round(confidence * 100, 2),
                     "timestamp": timestamp
                 }
+
+            if mode == "speculative":
+                result = self._apply_speculative_decoding(result)
+
+            if explain:
+                result["explanation"] = self._get_explanation(input_data, result)
+
+            return result
         except Exception as e:
             logger.error(f"Prediction failed: {str(e)}")
             raise
@@ -169,17 +214,30 @@ class MaterialsInferenceEngine(BaseInferenceEngine):
                 raise ValueError("Invalid input data")
             structure = input_data.get("structure", "")
             energy_threshold = input_data.get("energy_threshold", 0.5)
+            explain = input_data.get("explain", False)
+            mode = input_data.get("mode")
+
             model_name = os.path.basename(self.model_path)
             timestamp = datetime.now().isoformat()
             prediction = self.get_material_prediction(structure)
             confidence = prediction["confidence_score"] / 100.0
+
             if confidence < energy_threshold:
                 prediction = {k: None for k in prediction}
-            return {
+
+            result = {
                 "input_structure": structure,
                 "predicted_properties": prediction,
                 "timestamp": timestamp
             }
+
+            if mode == "speculative":
+                result = self._apply_speculative_decoding(result)
+
+            if explain:
+                result["explanation"] = self._get_explanation(input_data, result)
+
+            return result
         except Exception as e:
             logger.error(f"Prediction failed: {str(e)}")
             raise
@@ -196,3 +254,42 @@ class MaterialsInferenceEngine(BaseInferenceEngine):
         """Validate materials input data"""
         required_fields = ["structure"]
         return all(field in input_data for field in required_fields)
+
+class LLMInferenceEngine(BaseInferenceEngine):
+    """ Mock LLM Engine for text generation """
+    def _get_mock_model(self) -> torch.nn.Module:
+        return torch.nn.Identity() # No real model needed for mock
+
+    def predict(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        prompt = input_data.get("prompt", "")
+        max_tokens = input_data.get("max_tokens", 100)
+
+        start_time = time.perf_counter()
+
+        # Simulate token generation
+        time_to_first_token = random.uniform(0.05, 0.15) # Simulate TTFT
+        time.sleep(time_to_first_token)
+
+        # Simulate rest of the generation
+        time.sleep(0.005 * max_tokens) # Simulate work per token
+        words = ["lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit"]
+        response_text = " ".join(random.choices(words, k=max_tokens))
+
+        end_time = time.perf_counter()
+
+        total_latency_ms = (end_time - start_time) * 1000
+        ttft_ms = time_to_first_token * 1000
+        tokens_per_second = max_tokens / (total_latency_ms / 1000) if total_latency_ms > 0 else float('inf')
+
+        return {
+            "response": response_text,
+            "tokens_generated": max_tokens,
+            "metrics": {
+                "total_latency_ms": round(total_latency_ms, 2),
+                "time_to_first_token_ms": round(ttft_ms, 2),
+                "tokens_per_second": round(tokens_per_second, 2)
+            }
+        }
+
+    def _validate_input(self, input_data: Dict[str, Any]) -> bool:
+        return "prompt" in input_data

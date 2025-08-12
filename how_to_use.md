@@ -1,4 +1,4 @@
-# How to Use SciML Hub
+# How to Use Nexa_Inference 
 
 This guide provides step-by-step instructions for using SciML Hub's API to access machine learning models for scientific predictions.
 
